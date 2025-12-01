@@ -19,6 +19,10 @@ NONESSENTIAL_PACMAN_PACKAGES=(
     docker
     docker-compose
     github-cli
+    libsoup
+    webkit2gtk
+    webkit2gtk-4.1
+    gtk3
     
     # Entertainment
     cava
