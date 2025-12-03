@@ -56,6 +56,10 @@ NONESSENTIAL_PACMAN_PACKAGES=(
     # Window managers (additional)
     i3-wm
     polybar
+
+    # Android phone
+    android-udev
+    gvfs-mtp
     
     # Hardware info
     hwinfo
