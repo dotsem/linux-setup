@@ -1,23 +1,29 @@
 #!/bin/bash
-# Installation wrapper script - Provides easy access to both installation methods
+# Installation wrapper script - Multi-distro support
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Colors
+source "$SCRIPT_DIR/vars.sh"
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 CYAN='\033[0;36m'
+MAGENTA='\033[0;35m'
 NC='\033[0m'
 
 show_menu() {
     clear
     echo -e "${BLUE}╔═══════════════════════════════════════════════════╗${NC}"
     echo -e "${BLUE}║                                                   ║${NC}"
-    echo -e "${BLUE}║           ARCH LINUX SETUP INSTALLER              ║${NC}"
+    echo -e "${BLUE}║           LINUX SYSTEM SETUP                      ║${NC}"
+    echo -e "${BLUE}║                                                   ║${NC}"
+    echo -e "${BLUE}║   Multi-distro: Arch, Fedora, Debian/Ubuntu       ║${NC}"
     echo -e "${BLUE}║                                                   ║${NC}"
     echo -e "${BLUE}╚═══════════════════════════════════════════════════╝${NC}\n"
+    
+    echo -e "${CYAN}Detected: ${GREEN}$DETECTED_DISTRO_NAME${NC} (${DETECTED_PKG_MANAGER})\n"
     
     echo -e "${CYAN}What would you like to do?${NC}\n"
     echo -e "  ${GREEN}1)${NC} Fresh Installation (Recommended)"
@@ -36,8 +42,8 @@ show_menu() {
     echo -e "  ${GREEN}4)${NC} Check Installation Status"
     echo -e "     → View installation progress\n"
     
-    echo -e "  ${GREEN}5)${NC} Legacy Installation"
-    echo -e "     → Install everything at once (old method)\n"
+    echo -e "  ${GREEN}5)${NC} Development Environment Setup"
+    echo -e "     → Setup Flutter, Node, Rust, Go, etc.\n"
     
     echo -e "  ${GREEN}6)${NC} View Documentation"
     echo -e "     → README, Migration Guide, etc.\n"
@@ -83,52 +89,55 @@ system_test() {
 check_status() {
     echo -e "\n${BLUE}Checking installation status...${NC}\n"
     
-    # Check if essential installation was run
+    echo -e "${CYAN}Detected distro:${NC} $DETECTED_DISTRO_NAME"
+    echo -e "${CYAN}Package manager:${NC} $DETECTED_PKG_MANAGER\n"
+    
     if [ -f "$HOME/arch_setup.log" ]; then
-        echo -e "${GREEN}✓${NC} Essential installation log exists"
-        
+        echo -e "${GREEN}✓${NC} Installation log exists"
         local log_size=$(du -h "$HOME/arch_setup.log" | cut -f1)
         echo -e "  Log size: $log_size"
-        
-        local last_line=$(tail -n 1 "$HOME/arch_setup.log" 2>/dev/null)
-        if echo "$last_line" | grep -q "Setup Complete"; then
-            echo -e "${GREEN}✓${NC} Essential installation completed"
-        else
-            echo -e "${YELLOW}⚠${NC} Essential installation may be incomplete"
-        fi
     else
-        echo -e "${YELLOW}⚠${NC} No essential installation log found"
-        echo -e "  Run option 1 for fresh installation"
+        echo -e "${YELLOW}⚠${NC} No installation log found"
     fi
     
     echo ""
     
-    # Check apres-setup status
     if [ -f "$SCRIPT_DIR/bin/apres-setup" ]; then
         bash "$SCRIPT_DIR/bin/apres-setup" status
-    else
-        echo -e "${YELLOW}⚠${NC} apres-setup not found"
     fi
     
     echo ""
     
-    # Check for sysunit
     if command -v sysunit &>/dev/null || [ -f "$SCRIPT_DIR/bin/sysunit" ]; then
         echo -e "${GREEN}✓${NC} System test tool (sysunit) available"
-    else
-        echo -e "${YELLOW}⚠${NC} System test tool not found"
     fi
 }
 
-legacy_installation() {
-    echo -e "\n${YELLOW}Starting legacy installation...${NC}\n"
+development_setup() {
+    echo -e "\n${BLUE}Development Environment Setup${NC}\n"
     
-    if [ ! -f "$SCRIPT_DIR/arch-setup.sh" ]; then
-        echo -e "${RED}Error: arch-setup.sh not found!${NC}"
-        return 1
-    fi
+    source "$SCRIPT_DIR/modules/development.sh"
+    source "$SCRIPT_DIR/modules/flutter.sh"
     
-    bash "$SCRIPT_DIR/arch-setup.sh"
+    echo -e "  ${GREEN}1)${NC} All development tools"
+    echo -e "  ${GREEN}2)${NC} Flutter + Android SDK only"
+    echo -e "  ${GREEN}3)${NC} Node.js + PNPM only"
+    echo -e "  ${GREEN}4)${NC} Rust only"
+    echo -e "  ${GREEN}5)${NC} Go only"
+    echo -e "  ${GREEN}6)${NC} Back to main menu\n"
+    
+    echo -ne "${YELLOW}Enter your choice:${NC} "
+    read -r dev_choice
+    
+    case $dev_choice in
+        1) setup_all_development && setup_flutter_environment ;;
+        2) setup_flutter_environment ;;
+        3) setup_node ;;
+        4) setup_rust ;;
+        5) setup_go ;;
+        6) return ;;
+        *) echo -e "${RED}Invalid choice${NC}" ;;
+    esac
 }
 
 view_docs() {
@@ -139,9 +148,8 @@ view_docs() {
     
     echo -e "${CYAN}Available documentation:${NC}\n"
     echo -e "  ${GREEN}1)${NC} README.md - Main documentation"
-    echo -e "  ${GREEN}2)${NC} MIGRATION.md - Migration guide"
-    echo -e "  ${GREEN}3)${NC} TODO-STATUS.md - Feature completion status"
-    echo -e "  ${GREEN}4)${NC} Back to main menu\n"
+    echo -e "  ${GREEN}2)${NC} CHANGELOG.md - Version history"
+    echo -e "  ${GREEN}3)${NC} Back to main menu\n"
     
     echo -ne "${YELLOW}Enter your choice:${NC} "
     read -r doc_choice
@@ -155,20 +163,13 @@ view_docs() {
             fi
             ;;
         2)
-            if [ -f "$SCRIPT_DIR/MIGRATION.md" ]; then
-                less "$SCRIPT_DIR/MIGRATION.md"
+            if [ -f "$SCRIPT_DIR/CHANGELOG.md" ]; then
+                less "$SCRIPT_DIR/CHANGELOG.md"
             else
-                echo -e "${RED}MIGRATION.md not found${NC}"
+                echo -e "${RED}CHANGELOG.md not found${NC}"
             fi
             ;;
         3)
-            if [ -f "$SCRIPT_DIR/TODO-STATUS.md" ]; then
-                less "$SCRIPT_DIR/TODO-STATUS.md"
-            else
-                echo -e "${RED}TODO-STATUS.md not found${NC}"
-            fi
-            ;;
-        4)
             return
             ;;
         *)
@@ -180,7 +181,6 @@ view_docs() {
     read
 }
 
-# Main loop
 main() {
     while true; do
         show_menu
@@ -208,7 +208,7 @@ main() {
                 read
                 ;;
             5)
-                legacy_installation
+                development_setup
                 echo -e "\n${YELLOW}Press Enter to continue...${NC}"
                 read
                 ;;
@@ -227,5 +227,4 @@ main() {
     done
 }
 
-# Run main function
 main

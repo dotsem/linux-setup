@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Non-essential packages for après-setup
+# Non-essential packages for après-setup (Arch Linux / Manjaro)
 # These can be installed after the system is functional
 
 NONESSENTIAL_PACMAN_PACKAGES=(
@@ -15,7 +15,6 @@ NONESSENTIAL_PACMAN_PACKAGES=(
     python
     python-pip
     php
-    mysql
     docker
     docker-compose
     github-cli
@@ -23,6 +22,12 @@ NONESSENTIAL_PACMAN_PACKAGES=(
     webkit2gtk
     webkit2gtk-4.1
     gtk3
+    
+    # Java (JDK 21)
+    jdk21-openjdk
+    
+    # .NET SDK
+    dotnet-sdk
     
     # Entertainment
     cava
@@ -38,11 +43,13 @@ NONESSENTIAL_PACMAN_PACKAGES=(
     
     # Office and productivity
     libreoffice-still
-    obsidian
     qalculate-gtk
     
     # Image viewer
     gwenview
+    
+    # Photo editing
+    rawtherapee
     
     # Games
     openttd
@@ -65,19 +72,32 @@ NONESSENTIAL_PACMAN_PACKAGES=(
     hwinfo
 
     baobab
+    
+    # Multimedia
+    ffmpeg
+    vlc
+    
+    # Gaming dependencies
+    vulkan-icd-loader
+    vulkan-tools
+    lib32-vulkan-icd-loader
+    gamemode
+    lib32-gamemode
+    mangohud
 )
 
 NONESSENTIAL_AUR_PACKAGES=(
-    # Browsers (-bin for faster installation)
+    # Browsers
     google-chrome
     zen-browser-bin
     
-    # Development (-bin packages where available)
+    # Development
     visual-studio-code-bin
     antigravity-bin
     android-sdk
+    android-sdk-cmdline-tools-latest
     angular-cli
-    flutter  # or flutter-bin for faster install
+    flutter
     xampp
     
     # Communication
@@ -86,22 +106,21 @@ NONESSENTIAL_AUR_PACKAGES=(
     # Gaming
     steam
     lutris
-    gamemode
     obs-studio
     retroarch
     
     # Music
     tuxguitar
-    spotify-bin
+    spotify-launcher
     
-    # Utilities (-bin for efficiency)
-    neofetch-bin
+    # Utilities
+    neofetch
     quickshell-git
     xwaylandvideobridge
-    yay-bin  # Use binary version of yay itself
+    yay-bin
     
     # System monitors
-    btop-bin
+    btop
     
     # Additional tools
     postman-bin
@@ -111,4 +130,5 @@ NONESSENTIAL_AUR_PACKAGES=(
 NONESSENTIAL_FLATPAK_PACKAGES=(
     org.gnome.Mahjongg
     com.github.wwmm.easyeffects
+    md.obsidian.Obsidian
 )

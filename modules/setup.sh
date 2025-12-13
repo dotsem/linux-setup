@@ -1,19 +1,42 @@
 #!/bin/bash
+# Core Setup Module
+# Handles: directories, git, network, dotfiles (via stow), display manager
 
 source "$(dirname "${BASH_SOURCE[0]}")/../helpers/ui.sh"
 source "$(dirname "${BASH_SOURCE[0]}")/../helpers/logging.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../vars.sh"
 
 setup_directories() {
     log "INFO" "Creating standard user directories"
     
     local dirs=(
+        # Standard XDG directories
         "$HOME/.config"
+        "$HOME/.local/bin"
+        "$HOME/.local/share"
         "$HOME/Documents"
         "$HOME/Downloads"
         "$HOME/Music"
         "$HOME/Pictures"
         "$HOME/Videos"
         "$HOME/Desktop"
+        
+        # Programming project folders
+        "$HOME/prog"
+        "$HOME/prog/c"
+        "$HOME/prog/c++"
+        "$HOME/prog/csharp"
+        "$HOME/prog/di"
+        "$HOME/prog/flutter"
+        "$HOME/prog/go"
+        "$HOME/prog/web"
+        "$HOME/prog/java"
+        "$HOME/prog/linux-web-services"
+        "$HOME/prog/php"
+        "$HOME/prog/python"
+        "$HOME/prog/rust"
+        "$HOME/prog/shell"
+        "$HOME/prog/sin"
     )
     
     local failed=0
@@ -52,6 +75,8 @@ setup_git() {
     
     if git config --global user.name "$GIT_NAME" && \
        git config --global user.email "$GIT_EMAIL"; then
+        git config --global init.defaultBranch main
+        git config --global pull.rebase false
         log "INFO" "Git configured for $GIT_NAME <$GIT_EMAIL>"
         echo -e "${GREEN}Git configured successfully!${NC}"
         return 0
@@ -63,6 +88,8 @@ setup_git() {
 }
 
 clone_dotfiles() {
+    section "DOTFILES SETUP (GNU Stow)" "$CYAN"
+    
     if [ -z "$DOTFILES_URL" ]; then
         log "WARN" "No DOTFILES_URL specified, skipping dotfiles setup"
         echo -e "${YELLOW}Skipping dotfiles setup (no URL specified)${NC}"
@@ -70,52 +97,76 @@ clone_dotfiles() {
     fi
     
     log "INFO" "Cloning dotfiles from $DOTFILES_URL"
-    local dotfiles_dir="$HOME/.config"
     
-    if [ -d "$dotfiles_dir" ]; then
-        # Remove existing dotfiles
-        if rm -rf "$dotfiles_dir"; then
-            log "INFO" "Removed existing dotfiles at $dotfiles_dir"
-        else
-            log "ERROR" "Failed to remove existing dotfiles at $dotfiles_dir"
-            echo -e "${RED}Failed to remove existing dotfiles!${NC}"
-            return 1
-        fi
+    if ! command -v stow &>/dev/null; then
+        log "INFO" "Installing stow..."
+        case "$DETECTED_PKG_MANAGER" in
+            pacman) sudo -n pacman -S --noconfirm stow 2>>"$LOG_FILE" ;;
+            dnf) sudo -n dnf install -y stow 2>>"$LOG_FILE" ;;
+            apt) sudo -n apt-get install -y stow 2>>"$LOG_FILE" ;;
+        esac
     fi
     
-    if git clone "$DOTFILES_URL" "$dotfiles_dir"; then
-        if [ -d "$dotfiles_dir" ]; then
-            if rsync -a "$dotfiles_dir/" "$HOME/.config/" && \
-               rm -rf "$dotfiles_dir"; then
-                log "INFO" "Dotfiles successfully installed"
-                echo -e "${GREEN}Dotfiles installed successfully!${NC}"
-                return 0
-            else
-                log "ERROR" "Failed to sync dotfiles to .config"
-                echo -e "${RED}Error installing dotfiles!${NC}"
-                return 1
-            fi
-        else
-            log "ERROR" "Dotfiles directory missing after clone"
-            echo -e "${RED}Error: Dotfiles directory not found after clone${NC}"
-            return 1
-        fi
+    if [ -d "$DOTFILES_DIR" ]; then
+        log "INFO" "Dotfiles already exist, pulling updates..."
+        cd "$DOTFILES_DIR"
+        git pull 2>>"$LOG_FILE" || log "WARN" "Failed to pull updates"
+        cd - >/dev/null
     else
-        log "ERROR" "Failed to clone dotfiles repository"
-        echo -e "${RED}Failed to clone dotfiles!${NC}"
-        return 1
+        git clone "$DOTFILES_URL" "$DOTFILES_DIR" 2>>"$LOG_FILE" || {
+            log "ERROR" "Failed to clone dotfiles"
+            echo -e "${RED}Failed to clone dotfiles!${NC}"
+            return 1
+        }
     fi
-
-    ln -s /home/sem/.config/hypr/background-changer/img /home/sem/Pictures/img
+    
+    cd "$DOTFILES_DIR"
+    
+    local stowed=0
+    local failed=0
+    
+    for pkg in */; do
+        pkg="${pkg%/}"
+        [ -d "$pkg" ] || continue
+        [[ "$pkg" == .* ]] && continue
+        [[ "$pkg" == "README"* ]] && continue
+        
+        log "INFO" "Stowing $pkg..."
+        if stow -v --target="$HOME" "$pkg" 2>>"$LOG_FILE"; then
+            stowed=$((stowed + 1))
+        else
+            log "WARN" "Failed to stow $pkg"
+            failed=$((failed + 1))
+        fi
+    done
+    
+    cd - >/dev/null
+    
+    log "INFO" "Dotfiles installed via stow ($stowed packages, $failed failed)"
+    echo -e "${GREEN}Dotfiles installed! ($stowed packages stowed)${NC}"
+    
+    if [ $failed -gt 0 ]; then
+        echo -e "${YELLOW}$failed packages failed to stow (check for conflicts)${NC}"
+    fi
 }
-
 
 setup_network() {
     section "NETWORK CONFIGURATION" "$BLUE"
     log "INFO" "Configuring NetworkManager"
     
-    # Enable and start NetworkManager
-    if sudo -n systemctl enable --now NetworkManager 2>> "$LOG_FILE"; then
+    case "$DETECTED_PKG_MANAGER" in
+        dnf)
+            sudo -n systemctl enable --now NetworkManager 2>>"$LOG_FILE"
+            ;;
+        pacman)
+            sudo -n systemctl enable --now NetworkManager 2>>"$LOG_FILE"
+            ;;
+        apt)
+            sudo -n systemctl enable --now NetworkManager 2>>"$LOG_FILE"
+            ;;
+    esac
+    
+    if systemctl is-active NetworkManager &>/dev/null; then
         log "INFO" "NetworkManager enabled and started"
         echo -e "${GREEN}NetworkManager configured!${NC}"
         return 0
@@ -126,27 +177,49 @@ setup_network() {
     fi
 }
 
-setup_moncon() {
-    # only works when a valid moncon is already pressent
-    sh $HOME/.config/hypr/hyprmoncon/hyprmoncon.sh
+setup_sddm() {
+    section "SDDM DISPLAY MANAGER" "$BLUE"
+    log "INFO" "Setting up SDDM display manager"
+    
+    local display_managers=("gdm" "lightdm" "ly" "lxdm" "slim")
+    for dm in "${display_managers[@]}"; do
+        if systemctl is-enabled "$dm" &>/dev/null; then
+            log "INFO" "Disabling conflicting display manager: $dm"
+            sudo -n systemctl disable "$dm" 2>>"$LOG_FILE" || true
+        fi
+    done
+    
+    if sudo -n systemctl enable sddm 2>>"$LOG_FILE"; then
+        log "INFO" "Successfully enabled SDDM"
+        echo -e "${GREEN}SDDM display manager enabled!${NC}"
+        return 0
+    else
+        log "ERROR" "Failed to enable SDDM"
+        echo -e "${RED}Failed to enable SDDM!${NC}"
+        return 1
+    fi
 }
 
 setup_ly() {
-    log "INFO" "Setting up ly display manager"
-        
-    # Disable any existing display managers to avoid conflicts
+    log "INFO" "Setting up ly display manager (Arch only)"
+    
+    [ "$DETECTED_PKG_MANAGER" != "pacman" ] && {
+        log "INFO" "ly is Arch-specific, using SDDM instead"
+        setup_sddm
+        return $?
+    }
+    
     local display_managers=("gdm" "sddm" "lightdm" "lxdm" "slim")
     for dm in "${display_managers[@]}"; do
         if systemctl is-enabled "$dm" &>/dev/null; then
             log "INFO" "Disabling conflicting display manager: $dm"
-            sudo -n systemctl disable "$dm" 2>/dev/null || true
+            sudo -n systemctl disable "$dm" 2>>"$LOG_FILE" || true
         fi
     done
     
-    # Enable and start ly service
-    if sudo -n systemctl enable --now ly.service; then
-        log "INFO" "Successfully enabled and started ly service"
-        echo -e "${GREEN}ly display manager enabled and started!${NC}"
+    if sudo -n systemctl enable ly.service 2>>"$LOG_FILE"; then
+        log "INFO" "Successfully enabled ly service"
+        echo -e "${GREEN}ly display manager enabled!${NC}"
         return 0
     else
         log "ERROR" "Failed to enable ly service"
@@ -155,5 +228,8 @@ setup_ly() {
     fi
 }
 
-
-
+setup_moncon() {
+    if [ -f "$HOME/.config/hypr/hyprmoncon/hyprmoncon.sh" ]; then
+        sh "$HOME/.config/hypr/hyprmoncon/hyprmoncon.sh"
+    fi
+}

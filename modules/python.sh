@@ -1,9 +1,14 @@
 #!/bin/bash
+# Python Environment Module
+# Multi-distro support
+
 source "$(dirname "${BASH_SOURCE[0]}")/../helpers/ui.sh"
 source "$(dirname "${BASH_SOURCE[0]}")/../helpers/logging.sh"
+source "$(dirname "${BASH_SOURCE[0]}")/../vars.sh"
 
 setup_python_environment() {
-    # Check if Python is installed
+    section "Python Environment Setup" "$YELLOW"
+    
     check_python_installed() {
         if ! command -v python3 &> /dev/null; then
             log "ERROR" "Python3 is not installed"
@@ -17,35 +22,42 @@ setup_python_environment() {
         return 0
     }
 
-    # Install tkinter if missing
+    ensure_pip() {
+        if python3 -m pip --version &> /dev/null; then
+            log "INFO" "pip is available"
+            return 0
+        fi
+        
+        log "INFO" "Installing pip..."
+        case "$DETECTED_PKG_MANAGER" in
+            pacman)
+                sudo -n pacman -S --noconfirm python-pip 2>>"$LOG_FILE"
+                ;;
+            dnf)
+                sudo -n dnf install -y python3-pip 2>>"$LOG_FILE"
+                ;;
+            apt)
+                sudo -n apt-get install -y python3-pip 2>>"$LOG_FILE"
+                ;;
+        esac
+    }
+
     install_tkinter() {
         if python3 -c "import tkinter" &> /dev/null; then
             log "INFO" "tkinter is already available"
-            echo -e "${GREEN}tkinter is already installed${NC}"
             return 0
         fi
 
         log "INFO" "Installing tkinter"
-        echo -e "${YELLOW}Installing tkinter...${NC}"
-        
-        local distro=""
-        if [ -f /etc/os-release ]; then
-            distro=$(grep '^ID=' /etc/os-release | cut -d= -f2 | tr -d '"')
-        fi
-
-        case "$distro" in
-            "ubuntu"|"debian")
-                sudo -n apt-get install -y python3-tk
+        case "$DETECTED_PKG_MANAGER" in
+            pacman)
+                sudo -n pacman -S --noconfirm tk 2>>"$LOG_FILE"
                 ;;
-            "arch")
-                sudo -n pacman -S --noconfirm tk
+            dnf)
+                sudo -n dnf install -y python3-tkinter 2>>"$LOG_FILE"
                 ;;
-            "fedora"|"centos"|"rhel")
-                sudo -n dnf install -y python3-tkinter
-                ;;
-            *)
-                log "WARN" "Unknown distribution - attempting pip install"
-                python3 -m pip install tk --break-system-packages
+            apt)
+                sudo -n apt-get install -y python3-tk 2>>"$LOG_FILE"
                 ;;
         esac
 
@@ -54,26 +66,21 @@ setup_python_environment() {
             echo -e "${GREEN}tkinter installed!${NC}"
             return 0
         else
-            log "ERROR" "Failed to install tkinter"
-            echo -e "${RED}Failed to install tkinter!${NC}"
+            log "WARN" "Failed to install tkinter"
             return 1
         fi
     }
 
-    # Test Python functionality
     test_python() {
         log "INFO" "Testing basic Python functionality"
         
         if ! python3 -c "print('Python test successful')"; then
             log "ERROR" "Basic Python test failed"
-            echo -e "${RED}Basic Python test failed!${NC}"
             return 1
         fi
 
-        log "INFO" "Testing pip functionality"
         if ! python3 -m pip --version; then
             log "ERROR" "Pip test failed"
-            echo -e "${RED}Pip test failed!${NC}"
             return 1
         fi
 
@@ -82,39 +89,25 @@ setup_python_environment() {
         return 0
     }
 
-    # Test virtual environment creation
     test_venv() {
         local test_dir=$(mktemp -d)
-        log "INFO" "Testing virtual environment creation in $test_dir"
+        log "INFO" "Testing virtual environment creation"
         
         if python3 -m venv "$test_dir/test_venv"; then
-            log "INFO" "Virtual environment created successfully"
-            
-            # Test activation
             if source "$test_dir/test_venv/bin/activate"; then
-                log "INFO" "Virtual environment activated successfully"
                 deactivate
                 rm -rf "$test_dir"
                 echo -e "${GREEN}Virtual environment test passed!${NC}"
                 return 0
-            else
-                log "ERROR" "Failed to activate virtual environment"
-                rm -rf "$test_dir"
-                echo -e "${RED}Virtual environment activation failed!${NC}"
-                return 1
             fi
-        else
-            log "ERROR" "Failed to create virtual environment"
-            rm -rf "$test_dir"
-            echo -e "${RED}Virtual environment creation failed!${NC}"
-            return 1
         fi
+        
+        rm -rf "$test_dir"
+        echo -e "${YELLOW}Virtual environment test failed${NC}"
+        return 1
     }
 
-    # Main setup function
     local overall_success=0
-    
-    section "Python Environment Setup" "$YELLOW"
     
     check_python_installed || overall_success=1
     ensure_pip || overall_success=1
@@ -126,8 +119,8 @@ setup_python_environment() {
         log "INFO" "Python environment setup completed successfully"
         echo -e "\n${GREEN}Python environment is ready!${NC}"
     else
-        log "ERROR" "Python environment setup encountered errors"
-        echo -e "\n${YELLOW}Python setup completed with some warnings/errors${NC}"
+        log "WARN" "Python environment setup encountered issues"
+        echo -e "\n${YELLOW}Python setup completed with some warnings${NC}"
     fi
     
     return $overall_success

@@ -2,7 +2,7 @@
 # Essential packages needed for a functional system
 # These packages are installed first and are critical for basic operation
 
-# Core system packages
+# Core system packages (Arch Linux / Manjaro)
 ESSENTIAL_PACMAN_PACKAGES=(
     # Kernel and base
     base-devel
@@ -17,7 +17,11 @@ ESSENTIAL_PACMAN_PACKAGES=(
     xdg-desktop-portal-hyprland
     
     # Display manager
-    ly
+    sddm
+    
+    # KDE Plasma (backup DE)
+    plasma-desktop
+    plasma-wayland-protocols
     
     # Terminal and shell
     alacritty
@@ -53,6 +57,8 @@ ESSENTIAL_PACMAN_PACKAGES=(
     jq
     xxd
     htop
+    stow
+    rsync
     
     # Brightness and power
     brightnessctl
@@ -67,8 +73,8 @@ ESSENTIAL_PACMAN_PACKAGES=(
     btrfs-progs
     
     # Qt/GTK
-    qt5
-    qt6
+    qt5-base
+    qt6-base
     gtk-layer-shell
     
     # Hyprland ecosystem
@@ -85,6 +91,19 @@ ESSENTIAL_PACMAN_PACKAGES=(
     
     # Flatpak
     flatpak
+    
+    # Keyring
+    gnome-keyring
+    seahorse
+    libsecret
+    
+    # Virtualization for Android emulator
+    qemu-full
+    libvirt
+    virt-manager
+    dnsmasq
+    bridge-utils
+    edk2-ovmf
 )
 
 ESSENTIAL_AUR_PACKAGES=(
@@ -100,5 +119,4 @@ ESSENTIAL_AUR_PACKAGES=(
 )
 
 ESSENTIAL_FLATPAK_PACKAGES=(
-    # Add essential flatpaks here if needed
 )
