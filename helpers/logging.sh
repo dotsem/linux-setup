@@ -2,7 +2,7 @@
 source "$(dirname "${BASH_SOURCE[0]}")/../vars.sh"
 
 # Log file
-LOG_FILE="$HOME/arch_setup.log"
+LOG_FILE="$HOME/linux_setup.log"
 echo -e "${YELLOW}Installation log: ${LOG_FILE}${NC}"
 
 
