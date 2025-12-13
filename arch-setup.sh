@@ -1,4 +1,29 @@
 #!/bin/bash
+# Legacy installation script - kept for backward compatibility
+# 
+# For new installations, use install-essential.sh instead:
+#   ./install-essential.sh
+#
+# This script installs ALL packages (essential + non-essential) at once.
+# The new approach separates them for better control and error recovery.
+
+echo -e "\033[1;33m╔═══════════════════════════════════════════════════╗\033[0m"
+echo -e "\033[1;33m║                                                   ║\033[0m"
+echo -e "\033[1;33m║              LEGACY INSTALLATION MODE             ║\033[0m"
+echo -e "\033[1;33m║                                                   ║\033[0m"
+echo -e "\033[1;33m║  This is the old installation method.            ║\033[0m"
+echo -e "\033[1;33m║  Consider using the new method instead:          ║\033[0m"
+echo -e "\033[1;33m║    1. ./install-essential.sh                      ║\033[0m"
+echo -e "\033[1;33m║    2. apres-setup start                           ║\033[0m"
+echo -e "\033[1;33m║                                                   ║\033[0m"
+echo -e "\033[1;33m╚═══════════════════════════════════════════════════╝\033[0m\n"
+
+read -p "Continue with legacy installation? (y/N): " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "Installation cancelled. Run ./install-essential.sh for the new method."
+    exit 0
+fi
 
 # ===== USER CONFIGURATION =====
 GIT_NAME="Sem VB"
