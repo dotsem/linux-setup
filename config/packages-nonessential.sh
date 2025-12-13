@@ -74,6 +74,7 @@ NONESSENTIAL_AUR_PACKAGES=(
     
     # Development (-bin packages where available)
     visual-studio-code-bin
+    antigravity-bin
     android-sdk
     angular-cli
     flutter  # or flutter-bin for faster install
@@ -81,7 +82,6 @@ NONESSENTIAL_AUR_PACKAGES=(
     
     # Communication
     vesktop-bin
-    discord-bin
     
     # Gaming
     steam
