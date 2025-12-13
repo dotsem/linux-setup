@@ -1,27 +1,27 @@
-# Arch Linux Setup Script
+# Automatic Linux Setup Script
 
-A comprehensive, modular setup script for Arch Linux that handles everything from essential system configuration to non-essential package installation.
+A comprehensive, modular setup script for multiple Linux distros (tested on arch & fedora) that handles everything from essential system configuration to non-essential package installation.
 
 ## Features
 
-- ✅ **Two-phase installation**: Essential packages first, optional packages later
-- ✅ **Resume support**: Interrupted installations can be resumed
-- ✅ **Error handling**: Continues on errors, tracks failures
-- ✅ **System testing**: Built-in system unittest tool (`sysunit`)
-- ✅ **Background installation**: Non-essential packages install in background
-- ✅ **Modular design**: Easy to customize and extend
-- ✅ **Progress tracking**: See installation progress at any time
-- ✅ **USB configuration**: Disables USB autosuspend for reliability
-- ✅ **Flutter support**: Automatically sets up Flutter and Kolibri Shell
+- **Two-phase installation**: Essential packages first, optional packages later
+- **Resume support**: Interrupted installations can be resumed
+- **Error handling**: Continues on errors, tracks failures
+- **System testing**: Built-in system unittest tool (`sysunit`)
+- **Background installation**: Non-essential packages install in background
+- **Modular design**: Easy to customize and extend
+- **Progress tracking**: See installation progress at any time
+- **USB configuration**: Disables USB autosuspend for reliability
+- **Flutter support**: Automatically sets up Flutter and Kolibri Shell
 
 ## Quick Start
 
-### Fresh Arch Install
+### Fresh Install
 
 ```bash
 # 1. Clone this repository
-git clone <your-repo-url> ~/arch-setup
-cd ~/arch-setup
+git clone [https://github.com/dotsem/linux-setup.git](https://github.com/dotsem/linux-setup.git) ~/linux-setup
+cd ~/linux-setup
 
 # 2. Edit configuration
 nano vars.sh  # Set your name, email, dotfiles URL, etc.
@@ -48,11 +48,10 @@ apres-setup start
 ## Project Structure
 
 ```
-arch-setup/
+linux-setup/
 ├── setup-menu.sh           # Interactive menu (recommended entry point)
 ├── install-essential.sh    # Main installation script (essential packages only)
 ├── check-requirements.sh   # Pre-installation system checker
-├── arch-setup.sh          # Legacy script (kept for compatibility)
 ├── vars.sh                # User configuration
 │
 ├── bin/                   # Command-line tools
@@ -135,7 +134,6 @@ Pre-installation system requirements checker.
 ./check-requirements.sh
 
 # Checks:
-# - Arch-based system
 # - User privileges (not root, has sudo)
 # - Internet connectivity
 # - Disk space (minimum 5GB, recommended 10GB+)
@@ -268,7 +266,7 @@ All steps track errors but continue installation. Failed steps are reported at t
 ## Troubleshooting
 
 ### Installation Failed
-1. Check the log file: `~/arch_setup.log`
+1. Check the log file: `~/linux_setup.log`
 2. Run `sysunit` to identify issues
 3. Re-run the installer (it skips already-installed packages)
 
@@ -295,7 +293,7 @@ sysunit | grep "✗"  # Show only failed tests
 
 ## Logs
 
-- Main log: `~/arch_setup.log`
+- Main log: `~/linux_setup.log`
 - Apres-setup log: `~/.cache/apres-setup.log`
 
 ## Contributing
@@ -312,4 +310,4 @@ This is a personal setup script. Use at your own risk. Always review scripts bef
 
 ## Credits
 
-Created by Sem VB for personal Arch Linux installations.
+Created by Sem Van Broekhoven for personal automatic Linux installations.
