@@ -31,9 +31,7 @@ setup_nvidia() {
     if is_hybrid_gpu; then
         setup_optimus
     fi
-    
-    setup_nvidia_performance
-}
+    }
 
 setup_nvidia_fedora() {
     log "INFO" "Installing NVIDIA drivers for Fedora"
@@ -116,30 +114,6 @@ setup_optimus() {
     echo -e "${GREEN}Hybrid GPU (Optimus) support configured!${NC}"
     echo -e "${YELLOW}Use 'prime-run <app>' to run apps on NVIDIA GPU${NC}"
     echo -e "${YELLOW}Use 'envycontrol -s nvidia' to switch to dedicated GPU${NC}"
-}
-
-setup_nvidia_performance() {
-    section "NVIDIA PERFORMANCE MODE" "$YELLOW"
-    log "INFO" "Configuring NVIDIA for maximum performance on AC power"
-    
-    sudo tee /etc/udev/rules.d/80-nvidia-pm.rules > /dev/null << 'EOF'
-# Enable full performance (P0) on AC power
-ACTION=="change", SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="1", RUN+="/usr/bin/nvidia-smi -pm 1"
-ACTION=="change", SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="1", RUN+="/usr/bin/nvidia-smi -lgc 300,2100"
-
-# Enable power saving on battery
-ACTION=="change", SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="0", RUN+="/usr/bin/nvidia-smi -pm 0"
-EOF
-
-    sudo tee /etc/modprobe.d/nvidia-power.conf > /dev/null << 'EOF'
-# Enable power management features
-options nvidia NVreg_DynamicPowerManagement=0x02
-EOF
-
-    sudo udevadm control --reload-rules 2>>"$LOG_FILE"
-    
-    log "INFO" "NVIDIA performance mode configured"
-    echo -e "${GREEN}NVIDIA will use maximum performance (P0) when on AC power!${NC}"
 }
 
 is_hybrid_gpu() {
