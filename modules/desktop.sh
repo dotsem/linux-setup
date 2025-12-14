@@ -30,10 +30,15 @@ setup_sddm() {
             ;;
     esac
     
-    sudo -n systemctl enable sddm 2>>"$LOG_FILE"
-    
-    log "INFO" "SDDM enabled"
-    echo -e "${GREEN}SDDM display manager enabled!${NC}"
+    if sudo -n systemctl enable sddm 2>>"$LOG_FILE"; then
+        log "INFO" "SDDM enabled"
+        echo -e "${GREEN}SDDM display manager enabled!${NC}"
+        return 0
+    else
+        log "ERROR" "Failed to enable SDDM"
+        echo -e "${RED}Failed to enable SDDM!${NC}"
+        return 1
+    fi
 }
 
 setup_kde_plasma() {

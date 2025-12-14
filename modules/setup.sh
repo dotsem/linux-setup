@@ -177,28 +177,7 @@ setup_network() {
     fi
 }
 
-setup_sddm() {
-    section "SDDM DISPLAY MANAGER" "$BLUE"
-    log "INFO" "Setting up SDDM display manager"
-    
-    local display_managers=("gdm" "lightdm" "ly" "lxdm" "slim")
-    for dm in "${display_managers[@]}"; do
-        if systemctl is-enabled "$dm" &>/dev/null; then
-            log "INFO" "Disabling conflicting display manager: $dm"
-            sudo -n systemctl disable "$dm" 2>>"$LOG_FILE" || true
-        fi
-    done
-    
-    if sudo -n systemctl enable sddm 2>>"$LOG_FILE"; then
-        log "INFO" "Successfully enabled SDDM"
-        echo -e "${GREEN}SDDM display manager enabled!${NC}"
-        return 0
-    else
-        log "ERROR" "Failed to enable SDDM"
-        echo -e "${RED}Failed to enable SDDM!${NC}"
-        return 1
-    fi
-}
+
 
 setup_ly() {
     log "INFO" "Setting up ly display manager (Arch only)"

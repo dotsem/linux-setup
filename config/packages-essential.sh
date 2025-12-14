@@ -114,7 +114,6 @@ ESSENTIAL_AUR_PACKAGES=(
     rofi-wayland
     
     # Hyprland extras
-    hyprshell
     hyprsunset
 )
 
