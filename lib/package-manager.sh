@@ -109,7 +109,8 @@ install_yay() {
     fi
 
     log "INFO" "Building YAY package"
-    if makepkg -si --noconfirm 2>>"$LOG_FILE"; then
+    sudo -v
+    if PACMAN_AUTH="sudo -n" makepkg -si --noconfirm 2>>"$LOG_FILE"; then
         cd - >/dev/null
         log "INFO" "YAY installed successfully"
         echo -e "${GREEN}Yay installed successfully!${NC}"
