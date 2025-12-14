@@ -22,7 +22,7 @@ install_package() {
                 fi
                 ;;
             yay)
-                if yay -S --noconfirm --needed "$package" 2>>"$LOG_FILE"; then
+                if yay -S --noconfirm --needed --sudoloop "$package" 2>>"$LOG_FILE"; then
                     log "INFO" "Successfully installed $package via yay"
                     return 0
                 fi
