@@ -109,12 +109,22 @@ install_yay() {
     fi
 
     log "INFO" "Building YAY package"
-    sudo -v
-    if PACMAN_AUTH="sudo -n" makepkg -si --noconfirm 2>>"$LOG_FILE"; then
-        cd - >/dev/null
-        log "INFO" "YAY installed successfully"
-        echo -e "${GREEN}Yay installed successfully!${NC}"
-        return 0
+    if makepkg -s --noconfirm 2>>"$LOG_FILE"; then
+        local pkg_file=$(ls -1 yay-*.pkg.tar.zst 2>/dev/null | head -1)
+        if [ -z "$pkg_file" ]; then
+            pkg_file=$(ls -1 yay-*.pkg.tar.xz 2>/dev/null | head -1)
+        fi
+        
+        if [ -n "$pkg_file" ] && sudo -n pacman -U --noconfirm "$pkg_file" 2>>"$LOG_FILE"; then
+            cd - >/dev/null
+            log "INFO" "YAY installed successfully"
+            echo -e "${GREEN}Yay installed successfully!${NC}"
+            return 0
+        else
+            log "ERROR" "YAY package installation failed"
+            cd - >/dev/null
+            return 1
+        fi
     else
         log "ERROR" "YAY build failed"
         cd - >/dev/null
