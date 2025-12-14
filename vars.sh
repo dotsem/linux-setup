@@ -18,6 +18,9 @@ TARGET_PACKAGE_MANAGER="auto"
 PRIMARY_DE="hyprland"
 DISPLAY_MANAGER="sddm"
 
+# Bootloader: "grub" or "systemd-boot" (Arch only for systemd-boot)
+BOOTLOADER="systemd-boot"
+
 # Development versions
 FLUTTER_CHANNEL="stable"
 JAVA_VERSION="21"
