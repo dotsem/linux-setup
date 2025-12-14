@@ -55,12 +55,14 @@ setup_nvidia_arch() {
     
     sudo -n pacman -S --noconfirm nvidia nvidia-utils nvidia-settings 2>>"$LOG_FILE"
     
-    local current_modules=$(grep "^MODULES=" /etc/mkinitcpio.conf | cut -d'=' -f2 | tr -d '()')
-    if ! echo "$current_modules" | grep -q "nvidia"; then
-        if [ -n "$current_modules" ]; then
-            sudo -n sed -i "s/^MODULES=($current_modules)/MODULES=($current_modules nvidia nvidia_modeset nvidia_uvm nvidia_drm)/" /etc/mkinitcpio.conf
-        else
-            sudo -n sed -i 's/^MODULES=()/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)/' /etc/mkinitcpio.conf
+    local mkinitcpio_conf="/etc/mkinitcpio.conf"
+    if ! grep -q "nvidia" "$mkinitcpio_conf"; then
+        local nvidia_modules="nvidia nvidia_modeset nvidia_uvm nvidia_drm"
+        
+        if grep -q "^MODULES=()" "$mkinitcpio_conf"; then
+            sudo -n sed -i "s/^MODULES=()/MODULES=($nvidia_modules)/" "$mkinitcpio_conf"
+        elif grep -q "^MODULES=(" "$mkinitcpio_conf"; then
+            sudo -n sed -i "/^MODULES=(/s/)/ $nvidia_modules)/" "$mkinitcpio_conf"
         fi
         sudo -n mkinitcpio -P 2>>"$LOG_FILE"
     fi
