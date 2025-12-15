@@ -98,6 +98,15 @@ clone_dotfiles() {
     
     log "INFO" "Cloning dotfiles from $DOTFILES_URL"
     
+    if ! command -v git &>/dev/null; then
+        log "INFO" "Installing git..."
+        case "$DETECTED_PKG_MANAGER" in
+            pacman) sudo -n pacman -S --noconfirm git 2>>"$LOG_FILE" ;;
+            dnf) sudo -n dnf install -y git 2>>"$LOG_FILE" ;;
+            apt) sudo -n apt-get install -y git 2>>"$LOG_FILE" ;;
+        esac
+    fi
+    
     if ! command -v stow &>/dev/null; then
         log "INFO" "Installing stow..."
         case "$DETECTED_PKG_MANAGER" in

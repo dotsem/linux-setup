@@ -1,8 +1,7 @@
 #!/bin/bash
 # Main Setup Script - Multi-Distro Essential Installation
-# Supports: Arch Linux, Fedora, Debian/Ubuntu
-
-set -eo pipefail
+# Supports: Arch Linux, Fedora, Debian/Ubuntu, CachyOS
+# Note: Errors are tracked but don't stop execution - check summary at end
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
