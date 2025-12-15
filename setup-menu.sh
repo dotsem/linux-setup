@@ -72,12 +72,12 @@ resume_nonessential() {
 system_test() {
     echo -e "\n${BLUE}Running system tests...${NC}\n"
     
-    if [ ! -f "$SCRIPT_DIR/bin/sysunit" ]; then
+    if [ ! -f "$SCRIPT_DIR/sysunit" ]; then
         echo -e "${RED}Error: sysunit not found!${NC}"
         return 1
     fi
     
-    bash "$SCRIPT_DIR/bin/sysunit"
+    bash "$SCRIPT_DIR/sysunit"
 }
 
 check_status() {
@@ -96,13 +96,13 @@ check_status() {
     
     echo ""
     
-    if [ -f "$SCRIPT_DIR/bin/apres-setup" ]; then
-        bash "$SCRIPT_DIR/bin/apres-setup" status
+    if [ -f "$SCRIPT_DIR/apres-setup" ]; then
+        bash "$SCRIPT_DIR/apres-setup" status
     fi
     
     echo ""
     
-    if command -v sysunit &>/dev/null || [ -f "$SCRIPT_DIR/bin/sysunit" ]; then
+    if command -v sysunit &>/dev/null || [ -f "$SCRIPT_DIR/sysunit" ]; then
         echo -e "${GREEN}✓${NC} System test tool (sysunit) available"
     fi
 }
