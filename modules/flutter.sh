@@ -130,20 +130,20 @@ setup_flutter_sdk() {
 }
 
 setup_flutter_shell_config() {
-    local shell_config="$HOME/.zshrc"
+    local shell_config="$HOME/.config/fish/conf.d/flutter.fish"
+    mkdir -p "$(dirname "$shell_config")"
     
-    if ! grep -q 'ANDROID_HOME' "$shell_config" 2>/dev/null; then
-        cat >> "$shell_config" << EOF
-
+    if [ ! -f "$shell_config" ]; then
+        cat > "$shell_config" << 'EOF'
 # Android SDK
-export ANDROID_HOME=\$HOME/Android/Sdk
-export ANDROID_SDK_ROOT=\$ANDROID_HOME
-export PATH=\$PATH:\$ANDROID_HOME/cmdline-tools/latest/bin
-export PATH=\$PATH:\$ANDROID_HOME/platform-tools
-export PATH=\$PATH:\$ANDROID_HOME/emulator
+set -gx ANDROID_HOME $HOME/Android/Sdk
+set -gx ANDROID_SDK_ROOT $ANDROID_HOME
+fish_add_path $ANDROID_HOME/cmdline-tools/latest/bin
+fish_add_path $ANDROID_HOME/platform-tools
+fish_add_path $ANDROID_HOME/emulator
 
 # Flutter
-export PATH=\$PATH:\$HOME/.local/share/flutter/bin
+fish_add_path $HOME/.local/share/flutter/bin
 EOF
         log "INFO" "Added Android/Flutter to shell config"
     fi

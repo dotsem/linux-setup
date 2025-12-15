@@ -80,7 +80,7 @@ linux-setup/
 │   ├── security.sh       # Security configuration
 │   ├── setup.sh          # Basic system setup
 │   ├── usb.sh            # USB configuration
-│   └── zsh.sh            # Zsh shell setup
+│   └── fish.sh           # Fish shell setup
 │
 └── helpers/              # Helper utilities
     ├── colors.sh         # Color definitions
@@ -156,7 +156,7 @@ sysunit
 # - Network connectivity
 # - Audio system (PipeWire)
 # - Display configuration
-# - Shell setup (Zsh)
+# - Shell setup (Fish)
 # - Git configuration
 # - Package managers
 # - Python environment
@@ -190,7 +190,7 @@ apres-setup log
 ### Essential Packages
 Installed during initial setup. Required for a functional system:
 - **Display**: Hyprland, Wayland, display manager (ly)
-- **Terminal**: Alacritty, Zsh
+- **Terminal**: Alacritty, Fish
 - **Audio**: PipeWire, WirePlumber
 - **Network**: NetworkManager
 - **Basic tools**: Git, Neovim, file managers

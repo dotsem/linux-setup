@@ -21,7 +21,7 @@ source "$SCRIPT_DIR/modules/maintenance.sh"
 source "$SCRIPT_DIR/modules/neovim.sh"
 source "$SCRIPT_DIR/modules/performance.sh"
 source "$SCRIPT_DIR/modules/security.sh"
-source "$SCRIPT_DIR/modules/zsh.sh"
+source "$SCRIPT_DIR/modules/fish.sh"
 source "$SCRIPT_DIR/modules/usb.sh"
 source "$SCRIPT_DIR/modules/flutter.sh"
 source "$SCRIPT_DIR/modules/development.sh"
@@ -210,8 +210,7 @@ configure_system() {
     execute_step "Git configuration" setup_git
     execute_step "Network setup" setup_network
     execute_step "Audio setup (PipeWire)" setup_pipewire
-    execute_step "Zsh setup" setup_zsh
-    execute_step "Zsh plugins" setup_zsh_plugins
+    execute_step "Fish setup" setup_fish
     execute_step "Python environment" setup_python_environment
     execute_step "Font installation" install_fonts
     execute_step "Display manager (SDDM)" setup_sddm

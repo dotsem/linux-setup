@@ -22,9 +22,7 @@ ESSENTIAL_DNF_PACKAGES=(
     
     # Terminal and shell
     alacritty
-    zsh
-    zsh-syntax-highlighting
-    zsh-autosuggestions
+    fish
     
     # Audio (PipeWire)
     pipewire

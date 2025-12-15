@@ -11,8 +11,13 @@ setup_cloud() {
         log "INFO" "Rclone installed - manual config needed"
         print_status info "Run 'rclone config' to set up Google Drive"
         
-        # Add mount helper to zshrc
-        echo -e "\n# Rclone Google Drive mount\nalias gdrive='rclone mount --vfs-cache-mode full gdrive: ~/GoogleDrive &'" >> ~/.zshrc
+        # Add mount helper to fish config
+        mkdir -p ~/.config/fish/functions
+        cat > ~/.config/fish/functions/gdrive.fish << 'EOF'
+function gdrive --description 'Mount Google Drive via rclone'
+    rclone mount --vfs-cache-mode full gdrive: ~/GoogleDrive &
+end
+EOF
         print_status success "Google Drive alias configured"
     else
         log "ERROR" "Failed to install Rclone"

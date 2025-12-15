@@ -25,9 +25,7 @@ ESSENTIAL_PACMAN_PACKAGES=(
     
     # Terminal and shell
     alacritty
-    zsh
-    zsh-syntax-highlighting
-    zsh-autosuggestions
+    fish
     
     # Audio
     pipewire
@@ -107,8 +105,6 @@ ESSENTIAL_PACMAN_PACKAGES=(
 )
 
 ESSENTIAL_AUR_PACKAGES=(
-    # Shell
-    oh-my-zsh-git
     
     # Wayland tools
     rofi-wayland

@@ -139,18 +139,18 @@ setup_wayland_env() {
     section "WAYLAND ENVIRONMENT" "$BLUE"
     log "INFO" "Configuring Wayland environment variables"
     
-    local shell_config="$HOME/.zshrc"
-    if ! grep -q 'WAYLAND_DISPLAY' "$shell_config" 2>/dev/null; then
-        cat >> "$shell_config" << 'EOF'
-
+    local shell_config="$HOME/.config/fish/conf.d/wayland.fish"
+    mkdir -p "$(dirname "$shell_config")"
+    if [ ! -f "$shell_config" ]; then
+        cat > "$shell_config" << 'EOF'
 # Wayland environment (for Hyprland)
-if [ "$XDG_SESSION_TYPE" = "wayland" ]; then
-    export MOZ_ENABLE_WAYLAND=1
-    export QT_QPA_PLATFORM=wayland
-    export GDK_BACKEND=wayland,x11
-    export SDL_VIDEODRIVER=wayland
-    export CLUTTER_BACKEND=wayland
-fi
+if test "$XDG_SESSION_TYPE" = "wayland"
+    set -gx MOZ_ENABLE_WAYLAND 1
+    set -gx QT_QPA_PLATFORM wayland
+    set -gx GDK_BACKEND wayland,x11
+    set -gx SDL_VIDEODRIVER wayland
+    set -gx CLUTTER_BACKEND wayland
+end
 EOF
         log "INFO" "Added Wayland variables to shell config"
     fi

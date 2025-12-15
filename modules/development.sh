@@ -41,13 +41,13 @@ setup_go() {
     
     mkdir -p "$HOME/go/{bin,src,pkg}"
     
-    local shell_config="$HOME/.zshrc"
-    if ! grep -q 'GOPATH' "$shell_config" 2>/dev/null; then
-        cat >> "$shell_config" << 'EOF'
-
+    local shell_config="$HOME/.config/fish/conf.d/go.fish"
+    mkdir -p "$(dirname "$shell_config")"
+    if [ ! -f "$shell_config" ]; then
+        cat > "$shell_config" << 'EOF'
 # Go environment
-export GOPATH=$HOME/go
-export PATH=$PATH:$GOPATH/bin
+set -gx GOPATH $HOME/go
+fish_add_path $GOPATH/bin
 EOF
     fi
     
@@ -126,13 +126,13 @@ setup_java() {
         java_home="/usr/lib/jvm/default"
     fi
     
-    local shell_config="$HOME/.zshrc"
-    if ! grep -q 'JAVA_HOME' "$shell_config" 2>/dev/null; then
-        cat >> "$shell_config" << EOF
-
+    local shell_config="$HOME/.config/fish/conf.d/java.fish"
+    mkdir -p "$(dirname "$shell_config")"
+    if [ ! -f "$shell_config" ]; then
+        cat > "$shell_config" << EOF
 # Java environment
-export JAVA_HOME=$java_home
-export PATH=\$PATH:\$JAVA_HOME/bin
+set -gx JAVA_HOME $java_home
+fish_add_path \$JAVA_HOME/bin
 EOF
     fi
     
@@ -189,13 +189,13 @@ setup_dotnet() {
         esac
     fi
     
-    local shell_config="$HOME/.zshrc"
-    if ! grep -q 'DOTNET_ROOT' "$shell_config" 2>/dev/null; then
-        cat >> "$shell_config" << 'EOF'
-
+    local shell_config="$HOME/.config/fish/conf.d/dotnet.fish"
+    mkdir -p "$(dirname "$shell_config")"
+    if [ ! -f "$shell_config" ]; then
+        cat > "$shell_config" << 'EOF'
 # .NET environment
-export DOTNET_ROOT=/usr/lib64/dotnet
-export PATH=$PATH:$HOME/.dotnet/tools
+set -gx DOTNET_ROOT /usr/lib64/dotnet
+fish_add_path $HOME/.dotnet/tools
 EOF
     fi
     

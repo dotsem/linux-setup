@@ -221,25 +221,25 @@ test_display() {
 test_shell() {
     print_header "Shell Tests"
     
-    if command -v zsh > /dev/null 2>&1; then
-        local zsh_version=$(zsh --version 2>/dev/null | awk '{print $2}')
-        test_result "Zsh is installed" "pass" "$zsh_version" "shell"
+    if command -v fish > /dev/null 2>&1; then
+        local fish_version=$(fish --version 2>/dev/null | awk '{print $NF}')
+        test_result "Fish is installed" "pass" "$fish_version" "shell"
     else
-        test_result "Zsh is installed" "fail" "" "shell"
+        test_result "Fish is installed" "fail" "" "shell"
     fi
     
     local current_shell=$(getent passwd "$USER" | cut -d: -f7)
-    local zsh_path=$(command -v zsh 2>/dev/null)
-    if [ "$current_shell" = "$zsh_path" ]; then
-        test_result "Zsh is default shell" "pass" "" "shell"
+    local fish_path=$(command -v fish 2>/dev/null)
+    if [ "$current_shell" = "$fish_path" ]; then
+        test_result "Fish is default shell" "pass" "" "shell"
     else
-        test_result "Zsh is default shell" "warn" "Current: $current_shell" "shell"
+        test_result "Fish is default shell" "warn" "Current: $current_shell" "shell"
     fi
     
-    if [ -d "$HOME/.oh-my-zsh" ]; then
-        test_result "Oh My Zsh is installed" "pass" "" "shell"
+    if [ -f "$HOME/.config/fish/config.fish" ]; then
+        test_result "Fish config exists" "pass" "" "shell"
     else
-        test_result "Oh My Zsh is installed" "warn" "Not installed" "shell"
+        test_result "Fish config exists" "warn" "Not found" "shell"
     fi
 }
 
