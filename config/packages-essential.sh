@@ -32,7 +32,7 @@ ESSENTIAL_PACMAN_PACKAGES=(
     # Audio
     pipewire
     pipewire-pulse
-    pipewire-jack
+    lib32-pipewire-jack
     wireplumber
     pavucontrol
     
@@ -68,7 +68,7 @@ ESSENTIAL_PACMAN_PACKAGES=(
     dunst
     
     # File systems
-    exfat-utils
+    exfatprogs
     ntfs-3g
     btrfs-progs
     

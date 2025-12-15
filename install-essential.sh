@@ -228,7 +228,9 @@ configure_system() {
     execute_step "NVIDIA setup" setup_nvidia || true
     
     if [ "$DETECTED_PKG_MANAGER" = "pacman" ]; then
-        execute_step "GRUB configuration" setup_grub || true
+        if [ "$BOOTLOADER" = "grub" ]; then
+            execute_step "GRUB configuration" setup_grub || true
+        fi
         execute_step "Boot configuration" setup_boot || true
     fi
 }

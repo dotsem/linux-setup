@@ -91,22 +91,40 @@ setup_java() {
     log "INFO" "Setting up Java JDK $JAVA_VERSION"
     
     if ! command -v java &>/dev/null; then
-        log "ERROR" "Java not installed"
+        log "INFO" "Java not found, installing..."
+        case "$DETECTED_PKG_MANAGER" in
+            dnf)
+                sudo -n dnf install -y java-$JAVA_VERSION-openjdk-devel 2>>"$LOG_FILE"
+                ;;
+            pacman)
+                sudo -n pacman -S --noconfirm jdk$JAVA_VERSION-openjdk 2>>"$LOG_FILE"
+                ;;
+            apt)
+                sudo -n apt-get install -y openjdk-$JAVA_VERSION-jdk 2>>"$LOG_FILE"
+                ;;
+        esac
+    fi
+    
+    if ! command -v java &>/dev/null; then
+        log "ERROR" "Failed to install Java"
         return 1
     fi
     
     local java_home=""
-    case "$DETECTED_PKG_MANAGER" in
-        dnf)
-            java_home="/usr/lib/jvm/java-$JAVA_VERSION-openjdk"
-            ;;
-        pacman)
-            java_home="/usr/lib/jvm/java-$JAVA_VERSION-openjdk"
-            ;;
-        apt)
-            java_home="/usr/lib/jvm/java-$JAVA_VERSION-openjdk-amd64"
-            ;;
-    esac
+    # Try to auto-detect JAVA_HOME
+    if [ -d "/usr/lib/jvm/java-$JAVA_VERSION-openjdk" ]; then
+        java_home="/usr/lib/jvm/java-$JAVA_VERSION-openjdk"
+    elif [ -d "/usr/lib/jvm/java-${JAVA_VERSION}" ]; then
+        java_home="/usr/lib/jvm/java-${JAVA_VERSION}"
+    else
+        # Fallback: find any java directory
+        java_home=$(dirname $(dirname $(readlink -f $(which java)))) 2>/dev/null || true
+    fi
+    
+    if [ -z "$java_home" ] || [ ! -d "$java_home" ]; then
+        log "WARN" "Could not determine JAVA_HOME, using default"
+        java_home="/usr/lib/jvm/default"
+    fi
     
     local shell_config="$HOME/.zshrc"
     if ! grep -q 'JAVA_HOME' "$shell_config" 2>/dev/null; then
@@ -118,8 +136,8 @@ export PATH=\$PATH:\$JAVA_HOME/bin
 EOF
     fi
     
-    log "INFO" "Java JDK $JAVA_VERSION configured"
-    echo -e "${GREEN}Java JDK $JAVA_VERSION configured!${NC}"
+    log "INFO" "Java JDK configured (JAVA_HOME=$java_home)"
+    echo -e "${GREEN}Java JDK configured!${NC}"
 }
 
 setup_php() {
