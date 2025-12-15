@@ -114,12 +114,21 @@ EOF
     
     sudo -n mkdir -p "$entries_dir" 2>>"$LOG_FILE"
     
-    local root_partuuid=$(findmnt -no PARTUUID /)
-    if [ -z "$root_partuuid" ]; then
-        root_partuuid=$(findmnt -no UUID /)
-        local root_param="root=UUID=$root_partuuid"
+    local root_partuuid
+    local root_param
+    
+    root_partuuid=$(findmnt -no PARTUUID /)
+    if [ -n "$root_partuuid" ]; then
+        root_param="root=PARTUUID=$root_partuuid"
     else
-        local root_param="root=PARTUUID=$root_partuuid"
+        root_partuuid=$(findmnt -no UUID /)
+        if [ -n "$root_partuuid" ]; then
+            root_param="root=UUID=$root_partuuid"
+        else
+            log "ERROR" "Could not determine root partition UUID or PARTUUID"
+            echo -e "${RED}ERROR: Cannot determine root partition identifier${NC}"
+            return 1
+        fi
     fi
     
     local kernel_params="rw quiet"

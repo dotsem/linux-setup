@@ -31,7 +31,7 @@ setup_nvidia() {
     if is_hybrid_gpu; then
         setup_optimus
     fi
-    }
+}
 
 setup_nvidia_fedora() {
     log "INFO" "Installing NVIDIA drivers for Fedora"
