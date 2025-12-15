@@ -100,19 +100,32 @@ setup_systemd_boot() {
     fi
     
     local loader_conf="$esp/loader/loader.conf"
-    log "INFO" "Creating loader.conf at $loader_conf"
+    local entries_dir="$esp/loader/entries"
+    
     sudo -n mkdir -p "$esp/loader" 2>>"$LOG_FILE"
-    sudo tee "$loader_conf" > /dev/null << 'EOF'
-default arch.conf
+    sudo -n mkdir -p "$entries_dir" 2>>"$LOG_FILE"
+    
+    # Determine entry filename based on distro
+    local entry_basename="arch"
+    [ "$DETECTED_DISTRO_ID" = "cachyos" ] && entry_basename="cachyos"
+    [ "$DETECTED_DISTRO_ID" = "manjaro" ] && entry_basename="manjaro"
+    [ "$DETECTED_DISTRO_ID" = "endeavouros" ] && entry_basename="endeavouros"
+    
+    local entry_file="$entries_dir/${entry_basename}.conf"
+    local fallback_entry="$entries_dir/${entry_basename}-fallback.conf"
+    
+    # Only create loader.conf if it doesn't exist to avoid overwriting user's config
+    if [ ! -f "$loader_conf" ]; then
+        log "INFO" "Creating loader.conf at $loader_conf"
+        sudo tee "$loader_conf" > /dev/null << EOF
+default ${entry_basename}.conf
 timeout 3
 console-mode max
 editor no
 EOF
-    
-    local entries_dir="$esp/loader/entries"
-    local entry_file="$entries_dir/arch.conf"
-    
-    sudo -n mkdir -p "$entries_dir" 2>>"$LOG_FILE"
+    else
+        log "INFO" "loader.conf already exists, not overwriting"
+    fi
     
     local root_partuuid
     local root_param
@@ -144,6 +157,7 @@ EOF
     [ "$DETECTED_DISTRO_ID" = "manjaro" ] && distro_title="Manjaro"
     [ "$DETECTED_DISTRO_ID" = "endeavouros" ] && distro_title="EndeavourOS"
     
+    # Create main boot entry (overwrite to ensure correct config)
     log "INFO" "Creating boot entry at $entry_file"
     sudo tee "$entry_file" > /dev/null << EOF
 title   $distro_title
@@ -152,7 +166,7 @@ initrd  /$initramfs_image
 options $root_param $kernel_params
 EOF
     
-    local fallback_entry="$entries_dir/arch-fallback.conf"
+    # Create fallback boot entry
     sudo tee "$fallback_entry" > /dev/null << EOF
 title   $distro_title (fallback)
 linux   /$kernel_image
@@ -160,9 +174,34 @@ initrd  /initramfs-${KERNEL_TYPE}-fallback.img
 options $root_param $kernel_params
 EOF
     
+    # Add Windows boot entry if Windows is detected
+    setup_windows_boot_entry "$esp"
+    
     log "INFO" "systemd-boot configured successfully"
     echo -e "${GREEN}systemd-boot bootloader configured!${NC}"
-    echo -e "${YELLOW}Boot entries created: arch.conf, arch-fallback.conf${NC}"
+    echo -e "${YELLOW}Boot entries created: ${entry_basename}.conf, ${entry_basename}-fallback.conf${NC}"
+}
+
+setup_windows_boot_entry() {
+    local esp="$1"
+    local entries_dir="$esp/loader/entries"
+    local windows_entry="$entries_dir/windows.conf"
+    
+    # Check if Windows EFI exists
+    local windows_efi="$esp/EFI/Microsoft/Boot/bootmgfw.efi"
+    if [ ! -f "$windows_efi" ]; then
+        log "INFO" "Windows boot manager not found, skipping Windows entry"
+        return 0
+    fi
+    
+    log "INFO" "Windows detected, creating boot entry"
+    sudo tee "$windows_entry" > /dev/null << 'EOF'
+title   Windows
+efi     /EFI/Microsoft/Boot/bootmgfw.efi
+EOF
+    
+    log "INFO" "Windows boot entry created"
+    echo -e "${GREEN}Windows boot entry added!${NC}"
 }
 
 setup_boot() {

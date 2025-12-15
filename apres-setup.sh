@@ -8,26 +8,20 @@ LOG_FILE="$HOME/.cache/apres-setup.log"
 LOCK_FILE="$HOME/.cache/apres-setup.lock"
 PID_FILE="$HOME/.cache/apres-setup.pid"
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-MAGENTA='\033[0;35m'
-NC='\033[0m'
-
-source "$SCRIPT_DIR/../vars.sh"
-source "$SCRIPT_DIR/../helpers/logging.sh"
+source "$SCRIPT_DIR/colors.sh"
+source "$SCRIPT_DIR/vars.sh"
+source "$SCRIPT_DIR/helpers/logging.sh"
 
 load_package_lists() {
     case "$DETECTED_PKG_MANAGER" in
         pacman)
-            source "$SCRIPT_DIR/../config/packages-nonessential.sh"
+            source "$SCRIPT_DIR/config/packages-nonessential.sh"
             ;;
         dnf)
-            source "$SCRIPT_DIR/../config/packages-nonessential-fedora.sh"
+            source "$SCRIPT_DIR/config/packages-nonessential-fedora.sh"
             ;;
         apt)
-            source "$SCRIPT_DIR/../config/packages-nonessential-apt.sh"
+            source "$SCRIPT_DIR/config/packages-nonessential-apt.sh"
             ;;
         *)
             echo -e "${RED}Unknown package manager: $DETECTED_PKG_MANAGER${NC}"
