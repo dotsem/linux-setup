@@ -139,9 +139,14 @@ EOF
     local kernel_image="vmlinuz-${KERNEL_TYPE}"
     local initramfs_image="initramfs-${KERNEL_TYPE}.img"
     
+    local distro_title="Arch Linux"
+    [ "$DETECTED_DISTRO_ID" = "cachyos" ] && distro_title="CachyOS"
+    [ "$DETECTED_DISTRO_ID" = "manjaro" ] && distro_title="Manjaro"
+    [ "$DETECTED_DISTRO_ID" = "endeavouros" ] && distro_title="EndeavourOS"
+    
     log "INFO" "Creating boot entry at $entry_file"
     sudo tee "$entry_file" > /dev/null << EOF
-title   Arch Linux
+title   $distro_title
 linux   /$kernel_image
 initrd  /$initramfs_image
 options $root_param $kernel_params
@@ -149,7 +154,7 @@ EOF
     
     local fallback_entry="$entries_dir/arch-fallback.conf"
     sudo tee "$fallback_entry" > /dev/null << EOF
-title   Arch Linux (fallback)
+title   $distro_title (fallback)
 linux   /$kernel_image
 initrd  /initramfs-${KERNEL_TYPE}-fallback.img
 options $root_param $kernel_params

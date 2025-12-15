@@ -37,7 +37,7 @@ detect_distro() {
             fedora|rhel|centos)
                 echo "dnf"
                 ;;
-            arch|manjaro|endeavouros)
+            arch|manjaro|endeavouros|cachyos)
                 echo "pacman"
                 ;;
             ubuntu|debian|pop|linuxmint)
@@ -81,7 +81,27 @@ get_distro_name() {
     fi
 }
 
+# Get distro family (groups related distros)
+get_distro_family() {
+    local distro_id="${1:-$(get_distro_id)}"
+    case "$distro_id" in
+        arch|manjaro|endeavouros|cachyos)
+            echo "arch"
+            ;;
+        fedora|rhel|centos)
+            echo "fedora"
+            ;;
+        ubuntu|debian|pop|linuxmint)
+            echo "debian"
+            ;;
+        *)
+            echo "unknown"
+            ;;
+    esac
+}
+
 # Detected values (set at source time)
 DETECTED_PKG_MANAGER=$(get_package_manager)
 DETECTED_DISTRO_ID=$(get_distro_id)
 DETECTED_DISTRO_NAME=$(get_distro_name)
+DETECTED_DISTRO_FAMILY=$(get_distro_family)
