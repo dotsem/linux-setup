@@ -69,8 +69,14 @@ setup_zsh() {
         return 0
     fi
     
+    # Ensure zsh is in /etc/shells
+    if ! grep -q "$zsh_path" /etc/shells 2>/dev/null; then
+        echo "$zsh_path" | sudo tee -a /etc/shells >/dev/null
+    fi
+    
     log "INFO" "Setting Zsh as default shell"
-    if sudo -n chsh -s "$zsh_path" "$USER" 2>>"$LOG_FILE"; then
+    # Use usermod instead of chsh - works better on locked root systems
+    if sudo -n usermod --shell "$zsh_path" "$USER" 2>>"$LOG_FILE"; then
         log "INFO" "Successfully set Zsh as default shell"
         echo -e "${GREEN}Zsh set as default shell!${NC}"
         echo -e "${YELLOW}Note: Log out required for changes to take effect${NC}"
@@ -78,6 +84,7 @@ setup_zsh() {
     else
         log "ERROR" "Failed to set Zsh as default shell"
         echo -e "${RED}Failed to set Zsh as default shell${NC}"
+        echo -e "${YELLOW}Try manually: chsh -s $zsh_path${NC}"
         return 1
     fi
 }
