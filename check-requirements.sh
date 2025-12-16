@@ -3,7 +3,7 @@
 
 # Colors
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/colors.sh"
+source "$SCRIPT_DIR/helpers/colors.sh"
 
 CHECKS_PASSED=0
 CHECKS_FAILED=0

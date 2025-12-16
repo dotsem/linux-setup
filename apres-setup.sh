@@ -8,7 +8,7 @@ LOG_FILE="$HOME/.cache/apres-setup.log"
 LOCK_FILE="$HOME/.cache/apres-setup.lock"
 PID_FILE="$HOME/.cache/apres-setup.pid"
 
-source "$SCRIPT_DIR/colors.sh"
+source "$SCRIPT_DIR/helpers/colors.sh"
 source "$SCRIPT_DIR/vars.sh"
 source "$SCRIPT_DIR/helpers/logging.sh"
 
