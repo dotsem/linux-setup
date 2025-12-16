@@ -52,6 +52,7 @@ ESSENTIAL_PACMAN_PACKAGES=(
     which
     unzip
     7zip
+    cmake
     jq
     xxd
     htop
