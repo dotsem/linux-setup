@@ -138,7 +138,11 @@ development_setup() {
         3) setup_node ;;
         4) setup_rust ;;
         5) setup_go ;;
-        6) return ;;
+        6) setup_java ;;
+        7) setup_php ;;
+        8) setup_docker ;;
+        9) setup_dotnet ;;
+        0) return ;;
         *) echo -e "${RED}Invalid choice${NC}" ;;
     esac
 }

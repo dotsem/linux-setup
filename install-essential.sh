@@ -239,6 +239,7 @@ configure_system() {
 setup_development_if_needed() {
     section "Development Environment" "$MAGENTA"
     
+    execute_step "Docker setup" setup_docker
     execute_step "Node.js + PNPM" setup_node
     execute_step "Go environment" setup_go
     execute_step "Java environment" setup_java
