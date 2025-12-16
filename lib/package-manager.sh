@@ -16,7 +16,7 @@ install_package() {
 
         case $installer in
             pacman)
-                if sudo -n pacman -S --noconfirm --needed "$package" 2>>"$LOG_FILE"; then
+                if sudo pacman -S --noconfirm --needed "$package" 2>>"$LOG_FILE"; then
                     log "INFO" "Successfully installed $package via pacman"
                     return 0
                 fi
@@ -28,13 +28,13 @@ install_package() {
                 fi
                 ;;
             dnf)
-                if sudo -n dnf install -y "$package" 2>>"$LOG_FILE"; then
+                if sudo dnf install -y "$package" 2>>"$LOG_FILE"; then
                     log "INFO" "Successfully installed $package via dnf"
                     return 0
                 fi
                 ;;
             apt)
-                if sudo -n apt-get install -y "$package" 2>>"$LOG_FILE"; then
+                if sudo apt-get install -y "$package" 2>>"$LOG_FILE"; then
                     log "INFO" "Successfully installed $package via apt"
                     return 0
                 fi
@@ -48,8 +48,8 @@ install_package() {
             copr)
                 local repo="${package%%/*}"
                 local pkg="${package##*/}"
-                if sudo -n dnf copr enable -y "$repo" 2>>"$LOG_FILE" && \
-                   sudo -n dnf install -y "$pkg" 2>>"$LOG_FILE"; then
+                if sudo dnf copr enable -y "$repo" 2>>"$LOG_FILE" && \
+                   sudo dnf install -y "$pkg" 2>>"$LOG_FILE"; then
                     log "INFO" "Successfully installed $pkg from COPR $repo"
                     return 0
                 fi
@@ -57,9 +57,9 @@ install_package() {
             ppa)
                 local repo="${package%%/*}"
                 local pkg="${package##*/}"
-                if sudo -n add-apt-repository -y "ppa:$repo" 2>>"$LOG_FILE" && \
-                   sudo -n apt-get update 2>>"$LOG_FILE" && \
-                   sudo -n apt-get install -y "$pkg" 2>>"$LOG_FILE"; then
+                if sudo add-apt-repository -y "ppa:$repo" 2>>"$LOG_FILE" && \
+                   sudo apt-get update 2>>"$LOG_FILE" && \
+                   sudo apt-get install -y "$pkg" 2>>"$LOG_FILE"; then
                     log "INFO" "Successfully installed $pkg from PPA $repo"
                     return 0
                 fi
@@ -87,7 +87,7 @@ install_yay() {
     fi
 
     log "DEBUG" "Installing YAY dependencies"
-    sudo -n pacman -S --needed --noconfirm git base-devel || {
+    sudo pacman -S --needed --noconfirm git base-devel || {
         log "ERROR" "Failed to install YAY dependencies"
         return 1
     }
@@ -115,7 +115,7 @@ install_yay() {
             pkg_file=$(ls -1 yay-*.pkg.tar.xz 2>/dev/null | head -1)
         fi
         
-        if [ -n "$pkg_file" ] && sudo -n pacman -U --noconfirm "$pkg_file" 2>>"$LOG_FILE"; then
+        if [ -n "$pkg_file" ] && sudo pacman -U --noconfirm "$pkg_file" 2>>"$LOG_FILE"; then
             cd - >/dev/null
             log "INFO" "YAY installed successfully"
             echo -e "${GREEN}Yay installed successfully!${NC}"
@@ -140,12 +140,12 @@ setup_rpm_fusion() {
     
     local fedora_version=$(rpm -E %fedora)
     
-    sudo -n dnf install -y \
+    sudo dnf install -y \
         "https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-${fedora_version}.noarch.rpm" \
         "https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-${fedora_version}.noarch.rpm" \
         2>>"$LOG_FILE"
     
-    sudo -n dnf groupupdate -y core 2>>"$LOG_FILE"
+    sudo dnf groupupdate -y core 2>>"$LOG_FILE"
     
     log "INFO" "RPM Fusion enabled"
     echo -e "${GREEN}RPM Fusion enabled!${NC}"
@@ -157,19 +157,19 @@ setup_flatpak() {
     
     case "$DETECTED_PKG_MANAGER" in
         pacman)
-            sudo -n pacman -S --needed --noconfirm flatpak || {
+            sudo pacman -S --needed --noconfirm flatpak || {
                 log "ERROR" "Failed to install Flatpak"
                 return 1
             }
             ;;
         dnf)
-            sudo -n dnf install -y flatpak || {
+            sudo dnf install -y flatpak || {
                 log "ERROR" "Failed to install Flatpak"
                 return 1
             }
             ;;
         apt)
-            sudo -n apt-get install -y flatpak || {
+            sudo apt-get install -y flatpak || {
                 log "ERROR" "Failed to install Flatpak"
                 return 1
             }
@@ -259,18 +259,18 @@ system_update() {
     case "$DETECTED_PKG_MANAGER" in
         pacman)
             if command -v pacman-mirrors &>/dev/null; then
-                sudo -n pacman-mirrors --fasttrack 2>>"$LOG_FILE" || true
+                sudo pacman-mirrors --fasttrack 2>>"$LOG_FILE" || true
             fi
-            sudo -n pacman -Syy 2>>"$LOG_FILE"
-            sudo -n pacman -Syu --noconfirm 2>>"$LOG_FILE"
+            sudo pacman -Syy 2>>"$LOG_FILE"
+            sudo pacman -Syu --noconfirm 2>>"$LOG_FILE"
             ;;
         dnf)
-            sudo -n dnf check-update 2>>"$LOG_FILE" || true
-            sudo -n dnf upgrade -y 2>>"$LOG_FILE"
+            sudo dnf check-update 2>>"$LOG_FILE" || true
+            sudo dnf upgrade -y 2>>"$LOG_FILE"
             ;;
         apt)
-            sudo -n apt-get update 2>>"$LOG_FILE"
-            sudo -n apt-get upgrade -y 2>>"$LOG_FILE"
+            sudo apt-get update 2>>"$LOG_FILE"
+            sudo apt-get upgrade -y 2>>"$LOG_FILE"
             ;;
     esac
     

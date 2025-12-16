@@ -27,13 +27,13 @@ setup_pipewire() {
         log "WARN" "PipeWire not installed, installing..."
         case "$DETECTED_PKG_MANAGER" in
             pacman)
-                sudo -n pacman -S --noconfirm pipewire pipewire-pulse pipewire-jack wireplumber 2>>"$LOG_FILE"
+                sudo pacman -S --noconfirm pipewire pipewire-pulse pipewire-jack wireplumber 2>>"$LOG_FILE"
                 ;;
             dnf)
-                sudo -n dnf install -y pipewire pipewire-pulseaudio pipewire-jack-audio-connection-kit wireplumber 2>>"$LOG_FILE"
+                sudo dnf install -y pipewire pipewire-pulseaudio pipewire-jack-audio-connection-kit wireplumber 2>>"$LOG_FILE"
                 ;;
             apt)
-                sudo -n apt-get install -y pipewire pipewire-pulse pipewire-jack wireplumber 2>>"$LOG_FILE"
+                sudo apt-get install -y pipewire pipewire-pulse pipewire-jack wireplumber 2>>"$LOG_FILE"
                 ;;
         esac
     fi
@@ -64,14 +64,14 @@ setup_pipewire() {
         local conf_file="$conf_dir/audio_priority.conf"
         local content="@audio - nice -10"
         
-        sudo -n mkdir -p "$conf_dir" 2>>"$LOG_FILE"
+        sudo mkdir -p "$conf_dir" 2>>"$LOG_FILE"
         
         if [ -f "$conf_file" ] && grep -qxF "$content" "$conf_file"; then
             log "INFO" "Audio priority already configured"
             return 0
         fi
         
-        echo "$content" | sudo -n tee "$conf_file" > /dev/null
+        echo "$content" | sudo tee "$conf_file" > /dev/null
         log "INFO" "Audio priority configuration saved"
     }
 
@@ -83,7 +83,7 @@ setup_pipewire() {
             return 0
         else
             log "INFO" "Adding user to audio group"
-            sudo -n usermod -aG audio "$USER" >> "$LOG_FILE" 2>&1
+            sudo usermod -aG audio "$USER" >> "$LOG_FILE" 2>&1
         fi
     }
 

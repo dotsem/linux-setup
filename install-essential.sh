@@ -94,7 +94,7 @@ preflight_checks() {
     
     (
         while true; do
-            sudo -n true
+            sudo true
             sleep 60
             kill -0 "$$" 2>/dev/null || exit
         done
@@ -105,18 +105,18 @@ preflight_checks() {
     
     case "$DETECTED_PKG_MANAGER" in
         pacman)
-            if sudo -n fuser /var/lib/pacman/db.lck >/dev/null 2>&1; then
+            if sudo fuser /var/lib/pacman/db.lck >/dev/null 2>&1; then
                 echo -e "${RED}ERROR: Pacman database is locked${NC}"
                 exit 1
             fi
             ;;
         dnf)
-            if sudo -n fuser /var/lib/dnf/repos >/dev/null 2>&1; then
+            if sudo fuser /var/lib/dnf/repos >/dev/null 2>&1; then
                 echo -e "${YELLOW}Warning: DNF may have an active process${NC}"
             fi
             ;;
         apt)
-            if sudo -n fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; then
+            if sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; then
                 echo -e "${RED}ERROR: APT database is locked${NC}"
                 exit 1
             fi
@@ -184,7 +184,7 @@ install_essential_packages() {
             
         apt)
             section "Installing Essential Packages (APT)" "$BLUE"
-            sudo -n apt-get update 2>>"$LOG_FILE"
+            sudo apt-get update 2>>"$LOG_FILE"
             for pkg in "${ESSENTIAL_APT_PACKAGES[@]}"; do
                 if ! install_package "apt" "$pkg"; then
                     track_failure "apt:$pkg"
@@ -254,19 +254,19 @@ cleanup() {
     case "$DETECTED_PKG_MANAGER" in
         pacman)
             yay -Yc --noconfirm 2>>"$LOG_FILE" || true
-            sudo -n pacman -Sc --noconfirm 2>>"$LOG_FILE" || true
+            sudo pacman -Sc --noconfirm 2>>"$LOG_FILE" || true
             local orphans=$(pacman -Qtdq 2>/dev/null)
             if [ -n "$orphans" ]; then
-                sudo -n pacman -Rns $orphans --noconfirm 2>>"$LOG_FILE" || true
+                sudo pacman -Rns $orphans --noconfirm 2>>"$LOG_FILE" || true
             fi
             ;;
         dnf)
-            sudo -n dnf autoremove -y 2>>"$LOG_FILE" || true
-            sudo -n dnf clean all 2>>"$LOG_FILE" || true
+            sudo dnf autoremove -y 2>>"$LOG_FILE" || true
+            sudo dnf clean all 2>>"$LOG_FILE" || true
             ;;
         apt)
-            sudo -n apt-get autoremove -y 2>>"$LOG_FILE" || true
-            sudo -n apt-get autoclean 2>>"$LOG_FILE" || true
+            sudo apt-get autoremove -y 2>>"$LOG_FILE" || true
+            sudo apt-get autoclean 2>>"$LOG_FILE" || true
             ;;
     esac
     

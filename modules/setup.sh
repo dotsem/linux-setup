@@ -101,18 +101,18 @@ clone_dotfiles() {
     if ! command -v git &>/dev/null; then
         log "INFO" "Installing git..."
         case "$DETECTED_PKG_MANAGER" in
-            pacman) sudo -n pacman -S --noconfirm git 2>>"$LOG_FILE" ;;
-            dnf) sudo -n dnf install -y git 2>>"$LOG_FILE" ;;
-            apt) sudo -n apt-get install -y git 2>>"$LOG_FILE" ;;
+            pacman) sudo pacman -S --noconfirm git 2>>"$LOG_FILE" ;;
+            dnf) sudo dnf install -y git 2>>"$LOG_FILE" ;;
+            apt) sudo apt-get install -y git 2>>"$LOG_FILE" ;;
         esac
     fi
     
     if ! command -v stow &>/dev/null; then
         log "INFO" "Installing stow..."
         case "$DETECTED_PKG_MANAGER" in
-            pacman) sudo -n pacman -S --noconfirm stow 2>>"$LOG_FILE" ;;
-            dnf) sudo -n dnf install -y stow 2>>"$LOG_FILE" ;;
-            apt) sudo -n apt-get install -y stow 2>>"$LOG_FILE" ;;
+            pacman) sudo pacman -S --noconfirm stow 2>>"$LOG_FILE" ;;
+            dnf) sudo dnf install -y stow 2>>"$LOG_FILE" ;;
+            apt) sudo apt-get install -y stow 2>>"$LOG_FILE" ;;
         esac
     fi
     
@@ -165,13 +165,13 @@ setup_network() {
     
     case "$DETECTED_PKG_MANAGER" in
         dnf)
-            sudo -n systemctl enable --now NetworkManager 2>>"$LOG_FILE"
+            sudo systemctl enable --now NetworkManager 2>>"$LOG_FILE"
             ;;
         pacman)
-            sudo -n systemctl enable --now NetworkManager 2>>"$LOG_FILE"
+            sudo systemctl enable --now NetworkManager 2>>"$LOG_FILE"
             ;;
         apt)
-            sudo -n systemctl enable --now NetworkManager 2>>"$LOG_FILE"
+            sudo systemctl enable --now NetworkManager 2>>"$LOG_FILE"
             ;;
     esac
     
@@ -201,11 +201,11 @@ setup_ly() {
     for dm in "${display_managers[@]}"; do
         if systemctl is-enabled "$dm" &>/dev/null; then
             log "INFO" "Disabling conflicting display manager: $dm"
-            sudo -n systemctl disable "$dm" 2>>"$LOG_FILE" || true
+            sudo systemctl disable "$dm" 2>>"$LOG_FILE" || true
         fi
     done
     
-    if sudo -n systemctl enable ly.service 2>>"$LOG_FILE"; then
+    if sudo systemctl enable ly.service 2>>"$LOG_FILE"; then
         log "INFO" "Successfully enabled ly service"
         echo -e "${GREEN}ly display manager enabled!${NC}"
         return 0

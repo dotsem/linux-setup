@@ -65,13 +65,13 @@ setup_node() {
     if ! command -v node &>/dev/null; then
         case "$DETECTED_PKG_MANAGER" in
             dnf)
-                sudo -n dnf install -y nodejs npm 2>>"$LOG_FILE"
+                sudo dnf install -y nodejs npm 2>>"$LOG_FILE"
                 ;;
             pacman)
-                sudo -n pacman -S --noconfirm nodejs npm 2>>"$LOG_FILE"
+                sudo pacman -S --noconfirm nodejs npm 2>>"$LOG_FILE"
                 ;;
             apt)
-                sudo -n apt-get install -y nodejs npm 2>>"$LOG_FILE"
+                sudo apt-get install -y nodejs npm 2>>"$LOG_FILE"
                 ;;
         esac
     fi
@@ -94,13 +94,13 @@ setup_java() {
         log "INFO" "Java not found, installing..."
         case "$DETECTED_PKG_MANAGER" in
             dnf)
-                sudo -n dnf install -y java-$JAVA_VERSION-openjdk-devel 2>>"$LOG_FILE"
+                sudo dnf install -y java-$JAVA_VERSION-openjdk-devel 2>>"$LOG_FILE"
                 ;;
             pacman)
-                sudo -n pacman -S --noconfirm jdk$JAVA_VERSION-openjdk 2>>"$LOG_FILE"
+                sudo pacman -S --noconfirm jdk$JAVA_VERSION-openjdk 2>>"$LOG_FILE"
                 ;;
             apt)
-                sudo -n apt-get install -y openjdk-$JAVA_VERSION-jdk 2>>"$LOG_FILE"
+                sudo apt-get install -y openjdk-$JAVA_VERSION-jdk 2>>"$LOG_FILE"
                 ;;
         esac
     fi
@@ -178,13 +178,13 @@ setup_dotnet() {
     if ! command -v dotnet &>/dev/null; then
         case "$DETECTED_PKG_MANAGER" in
             dnf)
-                sudo -n dnf install -y dotnet-sdk-8.0 2>>"$LOG_FILE"
+                sudo dnf install -y dotnet-sdk-8.0 2>>"$LOG_FILE"
                 ;;
             pacman)
-                sudo -n pacman -S --noconfirm dotnet-sdk 2>>"$LOG_FILE"
+                sudo pacman -S --noconfirm dotnet-sdk 2>>"$LOG_FILE"
                 ;;
             apt)
-                sudo -n apt-get install -y dotnet-sdk-8.0 2>>"$LOG_FILE"
+                sudo apt-get install -y dotnet-sdk-8.0 2>>"$LOG_FILE"
                 ;;
         esac
     fi
@@ -209,22 +209,22 @@ setup_docker() {
     
     case "$DETECTED_PKG_MANAGER" in
         dnf)
-            sudo -n dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo 2>>"$LOG_FILE"
-            sudo -n dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin 2>>"$LOG_FILE"
+            sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo 2>>"$LOG_FILE"
+            sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin 2>>"$LOG_FILE"
             ;;
         pacman)
-            sudo -n pacman -S --noconfirm docker docker-compose 2>>"$LOG_FILE"
+            sudo pacman -S --noconfirm docker docker-compose 2>>"$LOG_FILE"
             ;;
         apt)
             curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg 2>>"$LOG_FILE"
             echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-            sudo -n apt-get update 2>>"$LOG_FILE"
-            sudo -n apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin 2>>"$LOG_FILE"
+            sudo apt-get update 2>>"$LOG_FILE"
+            sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin 2>>"$LOG_FILE"
             ;;
     esac
     
-    sudo -n systemctl enable --now docker 2>>"$LOG_FILE"
-    sudo -n usermod -aG docker "$USER" 2>>"$LOG_FILE"
+    sudo systemctl enable --now docker 2>>"$LOG_FILE"
+    sudo usermod -aG docker "$USER" 2>>"$LOG_FILE"
     
     log "INFO" "Docker configured"
     echo -e "${GREEN}Docker configured!${NC}"

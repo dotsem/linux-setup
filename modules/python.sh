@@ -31,13 +31,13 @@ setup_python_environment() {
         log "INFO" "Installing pip..."
         case "$DETECTED_PKG_MANAGER" in
             pacman)
-                sudo -n pacman -S --noconfirm python-pip 2>>"$LOG_FILE"
+                sudo pacman -S --noconfirm python-pip 2>>"$LOG_FILE"
                 ;;
             dnf)
-                sudo -n dnf install -y python3-pip 2>>"$LOG_FILE"
+                sudo dnf install -y python3-pip 2>>"$LOG_FILE"
                 ;;
             apt)
-                sudo -n apt-get install -y python3-pip 2>>"$LOG_FILE"
+                sudo apt-get install -y python3-pip 2>>"$LOG_FILE"
                 ;;
         esac
     }
@@ -51,13 +51,13 @@ setup_python_environment() {
         log "INFO" "Installing tkinter"
         case "$DETECTED_PKG_MANAGER" in
             pacman)
-                sudo -n pacman -S --noconfirm tk 2>>"$LOG_FILE"
+                sudo pacman -S --noconfirm tk 2>>"$LOG_FILE"
                 ;;
             dnf)
-                sudo -n dnf install -y python3-tkinter 2>>"$LOG_FILE"
+                sudo dnf install -y python3-tkinter 2>>"$LOG_FILE"
                 ;;
             apt)
-                sudo -n apt-get install -y python3-tk 2>>"$LOG_FILE"
+                sudo apt-get install -y python3-tk 2>>"$LOG_FILE"
                 ;;
         esac
 

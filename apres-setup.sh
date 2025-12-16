@@ -12,6 +12,29 @@ source "$SCRIPT_DIR/colors.sh"
 source "$SCRIPT_DIR/vars.sh"
 source "$SCRIPT_DIR/helpers/logging.sh"
 
+setup_sudo() {
+    # Check if we already have sudo access without password
+    if ! sudo -n true 2>/dev/null; then
+        echo -e "${YELLOW}Enter your sudo password to begin installation${NC}"
+        if ! sudo -v; then
+            echo -e "${RED}Authentication failed!${NC}"
+            exit 1
+        fi
+    fi
+
+    # Keep sudo alive in background
+    (
+        while true; do
+            sudo -n true
+            sleep 60
+            kill -0 "$$" 2>/dev/null || exit
+        done
+    ) 2>/dev/null &
+    SUDO_KEEPALIVE_PID=$!
+    
+    trap "rm -f $PID_FILE; kill $SUDO_KEEPALIVE_PID 2>/dev/null" EXIT INT TERM
+}
+
 load_package_lists() {
     case "$DETECTED_PKG_MANAGER" in
         pacman)
@@ -68,7 +91,7 @@ install_package() {
     
     case "$type" in
         pacman)
-            sudo -n pacman -S --noconfirm --needed "$package" >> "$LOG_FILE" 2>&1
+            sudo pacman -S --noconfirm --needed "$package" >> "$LOG_FILE" 2>&1
             return $?
             ;;
         yay)
@@ -76,18 +99,18 @@ install_package() {
             return $?
             ;;
         dnf)
-            sudo -n dnf install -y "$package" >> "$LOG_FILE" 2>&1
+            sudo dnf install -y "$package" >> "$LOG_FILE" 2>&1
             return $?
             ;;
         copr)
             local repo="${package%%/*}"
             local pkg="${package##*/}"
-            sudo -n dnf copr enable -y "$repo" >> "$LOG_FILE" 2>&1
-            sudo -n dnf install -y "$pkg" >> "$LOG_FILE" 2>&1
+            sudo dnf copr enable -y "$repo" >> "$LOG_FILE" 2>&1
+            sudo dnf install -y "$pkg" >> "$LOG_FILE" 2>&1
             return $?
             ;;
         apt)
-            sudo -n apt-get install -y "$package" >> "$LOG_FILE" 2>&1
+            sudo apt-get install -y "$package" >> "$LOG_FILE" 2>&1
             return $?
             ;;
         flatpak)
@@ -119,6 +142,7 @@ calculate_total() {
 }
 
 run_installation() {
+    setup_sudo
     load_package_lists
     
     local completed=$(load_progress)

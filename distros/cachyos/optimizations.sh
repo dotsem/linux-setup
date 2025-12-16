@@ -23,9 +23,9 @@ apply_cachyos_sysctl_tweaks() {
     # CachyOS already has good defaults, only apply NVIDIA-specific tweaks
     if lspci | grep -qi nvidia && [ "$ram_gb" -ge 8 ]; then
         if [ ! -f /etc/sysctl.d/99-performance.conf ]; then
-            echo "vm.dirty_background_ratio=5" | sudo -n tee /etc/sysctl.d/99-performance.conf > /dev/null
-            echo "vm.dirty_ratio=10" | sudo -n tee -a /etc/sysctl.d/99-performance.conf > /dev/null
-            sudo -n sysctl -p /etc/sysctl.d/99-performance.conf 2>>"$LOG_FILE"
+            echo "vm.dirty_background_ratio=5" | sudo tee /etc/sysctl.d/99-performance.conf > /dev/null
+            echo "vm.dirty_ratio=10" | sudo tee -a /etc/sysctl.d/99-performance.conf > /dev/null
+            sudo sysctl -p /etc/sysctl.d/99-performance.conf 2>>"$LOG_FILE"
             log "INFO" "Applied NVIDIA gaming performance tweaks"
             print_status success "NVIDIA gaming tweaks applied"
         else

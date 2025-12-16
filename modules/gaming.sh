@@ -27,22 +27,22 @@ setup_vulkan() {
     
     case "$DETECTED_PKG_MANAGER" in
         dnf)
-            sudo -n dnf install -y mesa-vulkan-drivers vulkan-loader vulkan-tools 2>>"$LOG_FILE"
+            sudo dnf install -y mesa-vulkan-drivers vulkan-loader vulkan-tools 2>>"$LOG_FILE"
             ;;
         pacman)
-            sudo -n pacman -S --noconfirm vulkan-icd-loader vulkan-tools lib32-vulkan-icd-loader 2>>"$LOG_FILE"
+            sudo pacman -S --noconfirm vulkan-icd-loader vulkan-tools lib32-vulkan-icd-loader 2>>"$LOG_FILE"
             if lspci | grep -qi nvidia; then
-                sudo -n pacman -S --noconfirm nvidia-utils lib32-nvidia-utils 2>>"$LOG_FILE"
+                sudo pacman -S --noconfirm nvidia-utils lib32-nvidia-utils 2>>"$LOG_FILE"
             fi
             if lspci | grep -qi "intel.*graphics"; then
-                sudo -n pacman -S --noconfirm vulkan-intel lib32-vulkan-intel 2>>"$LOG_FILE"
+                sudo pacman -S --noconfirm vulkan-intel lib32-vulkan-intel 2>>"$LOG_FILE"
             fi
             if lspci | grep -qi "amd.*graphics\|radeon"; then
-                sudo -n pacman -S --noconfirm vulkan-radeon lib32-vulkan-radeon 2>>"$LOG_FILE"
+                sudo pacman -S --noconfirm vulkan-radeon lib32-vulkan-radeon 2>>"$LOG_FILE"
             fi
             ;;
         apt)
-            sudo -n apt-get install -y mesa-vulkan-drivers libvulkan1 vulkan-tools 2>>"$LOG_FILE"
+            sudo apt-get install -y mesa-vulkan-drivers libvulkan1 vulkan-tools 2>>"$LOG_FILE"
             ;;
     esac
     
@@ -151,13 +151,13 @@ setup_gamemode() {
     
     case "$DETECTED_PKG_MANAGER" in
         dnf)
-            sudo -n dnf install -y gamemode mangohud 2>>"$LOG_FILE"
+            sudo dnf install -y gamemode mangohud 2>>"$LOG_FILE"
             ;;
         pacman)
-            sudo -n pacman -S --noconfirm gamemode lib32-gamemode mangohud lib32-mangohud 2>>"$LOG_FILE"
+            sudo pacman -S --noconfirm gamemode lib32-gamemode mangohud lib32-mangohud 2>>"$LOG_FILE"
             ;;
         apt)
-            sudo -n apt-get install -y gamemode 2>>"$LOG_FILE"
+            sudo apt-get install -y gamemode 2>>"$LOG_FILE"
             ;;
     esac
     

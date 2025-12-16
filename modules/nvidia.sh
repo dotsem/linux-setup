@@ -36,7 +36,7 @@ setup_nvidia() {
 setup_nvidia_fedora() {
     log "INFO" "Installing NVIDIA drivers for Fedora"
     
-    sudo -n dnf install -y akmod-nvidia xorg-x11-drv-nvidia-cuda nvidia-settings 2>>"$LOG_FILE"
+    sudo dnf install -y akmod-nvidia xorg-x11-drv-nvidia-cuda nvidia-settings 2>>"$LOG_FILE"
     
     echo -e "${YELLOW}Waiting for NVIDIA kernel module to build (this may take a few minutes)...${NC}"
     sudo akmods --force 2>>"$LOG_FILE"
@@ -51,24 +51,24 @@ setup_nvidia_fedora() {
 setup_nvidia_arch() {
     log "INFO" "Installing NVIDIA drivers for Arch"
     
-    sudo -n pacman -S --noconfirm nvidia nvidia-utils nvidia-settings 2>>"$LOG_FILE"
+    sudo pacman -S --noconfirm nvidia nvidia-utils nvidia-settings 2>>"$LOG_FILE"
     
     local mkinitcpio_conf="/etc/mkinitcpio.conf"
     if ! grep -q "nvidia" "$mkinitcpio_conf"; then
         local nvidia_modules="nvidia nvidia_modeset nvidia_uvm nvidia_drm"
         
         if grep -q "^MODULES=()" "$mkinitcpio_conf"; then
-            sudo -n sed -i "s/^MODULES=()/MODULES=($nvidia_modules)/" "$mkinitcpio_conf"
+            sudo sed -i "s/^MODULES=()/MODULES=($nvidia_modules)/" "$mkinitcpio_conf"
         elif grep -q "^MODULES=(" "$mkinitcpio_conf"; then
-            sudo -n sed -i "/^MODULES=(/s/)/ $nvidia_modules)/" "$mkinitcpio_conf"
+            sudo sed -i "/^MODULES=(/s/)/ $nvidia_modules)/" "$mkinitcpio_conf"
         fi
-        sudo -n mkinitcpio -P 2>>"$LOG_FILE"
+        sudo mkinitcpio -P 2>>"$LOG_FILE"
     fi
     
     local grub_file="/etc/default/grub"
     if [ -f "$grub_file" ] && ! grep -q "nvidia-drm.modeset=1" "$grub_file"; then
-        sudo -n sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\([^"]*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 nvidia-drm.modeset=1"/' "$grub_file"
-        sudo -n grub-mkconfig -o /boot/grub/grub.cfg 2>>"$LOG_FILE"
+        sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\([^"]*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 nvidia-drm.modeset=1"/' "$grub_file"
+        sudo grub-mkconfig -o /boot/grub/grub.cfg 2>>"$LOG_FILE"
     fi
     
     log "INFO" "NVIDIA drivers installed for Arch"
@@ -78,12 +78,12 @@ setup_nvidia_arch() {
 setup_nvidia_debian() {
     log "INFO" "Installing NVIDIA drivers for Debian/Ubuntu"
     
-    sudo -n apt-get install -y nvidia-driver nvidia-settings 2>>"$LOG_FILE"
+    sudo apt-get install -y nvidia-driver nvidia-settings 2>>"$LOG_FILE"
     
     local grub_file="/etc/default/grub"
     if [ -f "$grub_file" ] && ! grep -q "nvidia-drm.modeset=1" "$grub_file"; then
-        sudo -n sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\([^"]*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 nvidia-drm.modeset=1"/' "$grub_file"
-        sudo -n update-grub 2>>"$LOG_FILE"
+        sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\([^"]*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 nvidia-drm.modeset=1"/' "$grub_file"
+        sudo update-grub 2>>"$LOG_FILE"
     fi
     
     log "INFO" "NVIDIA drivers installed for Debian/Ubuntu"
@@ -96,16 +96,16 @@ setup_optimus() {
     
     case "$DETECTED_PKG_MANAGER" in
         dnf)
-            sudo -n dnf install -y switcheroo-control 2>>"$LOG_FILE"
-            sudo -n systemctl enable --now switcheroo-control 2>>"$LOG_FILE"
+            sudo dnf install -y switcheroo-control 2>>"$LOG_FILE"
+            sudo systemctl enable --now switcheroo-control 2>>"$LOG_FILE"
             pip install envycontrol --user 2>>"$LOG_FILE" || true
             ;;
         pacman)
-            sudo -n pacman -S --noconfirm nvidia-prime 2>>"$LOG_FILE"
+            sudo pacman -S --noconfirm nvidia-prime 2>>"$LOG_FILE"
             yay -S --noconfirm envycontrol 2>>"$LOG_FILE" || true
             ;;
         apt)
-            sudo -n apt-get install -y nvidia-prime 2>>"$LOG_FILE"
+            sudo apt-get install -y nvidia-prime 2>>"$LOG_FILE"
             pip install envycontrol --user 2>>"$LOG_FILE" || true
             ;;
     esac

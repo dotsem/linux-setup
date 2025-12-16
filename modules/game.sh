@@ -4,7 +4,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/../helpers/ui.sh"
 source "$(dirname "${BASH_SOURCE[0]}")/../helpers/logging.sh"
 
 setup_steam() {
-    sudo -n systemctl enable --now steam-media-proxy
+    sudo systemctl enable --now steam-media-proxy
 }
 
 setup_emulation() {

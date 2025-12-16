@@ -13,20 +13,20 @@ setup_power_management() {
     
     case "$DETECTED_PKG_MANAGER" in
         pacman)
-            sudo -n pacman -S --noconfirm power-profiles-daemon 2>>"$LOG_FILE" || \
-            sudo -n pacman -S --noconfirm cpupower 2>>"$LOG_FILE"
+            sudo pacman -S --noconfirm power-profiles-daemon 2>>"$LOG_FILE" || \
+            sudo pacman -S --noconfirm cpupower 2>>"$LOG_FILE"
             ;;
         dnf)
-            sudo -n dnf install -y power-profiles-daemon 2>>"$LOG_FILE"
+            sudo dnf install -y power-profiles-daemon 2>>"$LOG_FILE"
             ;;
         apt)
-            sudo -n apt-get install -y power-profiles-daemon 2>>"$LOG_FILE" || \
-            sudo -n apt-get install -y cpufrequtils 2>>"$LOG_FILE"
+            sudo apt-get install -y power-profiles-daemon 2>>"$LOG_FILE" || \
+            sudo apt-get install -y cpufrequtils 2>>"$LOG_FILE"
             ;;
     esac
     
     if command -v powerprofilesctl &>/dev/null; then
-        sudo -n systemctl enable --now power-profiles-daemon 2>>"$LOG_FILE"
+        sudo systemctl enable --now power-profiles-daemon 2>>"$LOG_FILE"
         log "INFO" "power-profiles-daemon enabled"
         print_status success "Power Profiles Daemon enabled (use 'powerprofilesctl' to switch)"
     fi

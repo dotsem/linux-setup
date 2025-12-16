@@ -15,19 +15,19 @@ setup_virtualization() {
     
     case "$DETECTED_PKG_MANAGER" in
         dnf)
-            sudo -n dnf install -y @virtualization qemu-kvm libvirt virt-manager bridge-utils 2>>"$LOG_FILE"
+            sudo dnf install -y @virtualization qemu-kvm libvirt virt-manager bridge-utils 2>>"$LOG_FILE"
             ;;
         pacman)
-            sudo -n pacman -S --noconfirm qemu-full libvirt virt-manager dnsmasq bridge-utils edk2-ovmf 2>>"$LOG_FILE"
+            sudo pacman -S --noconfirm qemu-full libvirt virt-manager dnsmasq bridge-utils edk2-ovmf 2>>"$LOG_FILE"
             ;;
         apt)
-            sudo -n apt-get install -y qemu-kvm libvirt-daemon-system virt-manager bridge-utils 2>>"$LOG_FILE"
+            sudo apt-get install -y qemu-kvm libvirt-daemon-system virt-manager bridge-utils 2>>"$LOG_FILE"
             ;;
     esac
     
-    sudo -n systemctl enable --now libvirtd 2>>"$LOG_FILE"
-    sudo -n usermod -aG libvirt "$USER" 2>>"$LOG_FILE"
-    sudo -n usermod -aG kvm "$USER" 2>>"$LOG_FILE"
+    sudo systemctl enable --now libvirtd 2>>"$LOG_FILE"
+    sudo usermod -aG libvirt "$USER" 2>>"$LOG_FILE"
+    sudo usermod -aG kvm "$USER" 2>>"$LOG_FILE"
     
     if [ ! -c /dev/kvm ]; then
         log "WARN" "KVM not available - check BIOS virtualization settings"

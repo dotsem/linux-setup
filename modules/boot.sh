@@ -14,9 +14,9 @@ setup_nvidia_modules() {
         local nvidia_modules="nvidia nvidia_modeset nvidia_uvm nvidia_drm"
         
         if grep -q "^MODULES=()" "$mkinitcpio_conf"; then
-            sudo -n sed -i "s/^MODULES=()/MODULES=($nvidia_modules)/" "$mkinitcpio_conf"
+            sudo sed -i "s/^MODULES=()/MODULES=($nvidia_modules)/" "$mkinitcpio_conf"
         elif grep -q "^MODULES=(" "$mkinitcpio_conf"; then
-            sudo -n sed -i "/^MODULES=(/s/)/ $nvidia_modules)/" "$mkinitcpio_conf"
+            sudo sed -i "/^MODULES=(/s/)/ $nvidia_modules)/" "$mkinitcpio_conf"
         fi
         log "INFO" "Added NVIDIA modules to mkinitcpio"
     fi
@@ -41,20 +41,20 @@ setup_grub() {
     fi
     
     if [ -n "$kernel_params" ] && ! grep -q "$kernel_params" "$grub_file"; then
-        sudo -n sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\"\([^\"]*\)\"/GRUB_CMDLINE_LINUX_DEFAULT=\"\1 $kernel_params\"/" "$grub_file"
+        sudo sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=\"\([^\"]*\)\"/GRUB_CMDLINE_LINUX_DEFAULT=\"\1 $kernel_params\"/" "$grub_file"
         log "INFO" "Added kernel parameters to GRUB: $kernel_params"
     fi
     
     case "$DETECTED_PKG_MANAGER" in
         pacman)
-            sudo -n grub-mkconfig -o /boot/grub/grub.cfg 2>>"$LOG_FILE"
+            sudo grub-mkconfig -o /boot/grub/grub.cfg 2>>"$LOG_FILE"
             ;;
         dnf)
-            sudo -n grub2-mkconfig -o /boot/grub2/grub.cfg 2>>"$LOG_FILE" || \
-            sudo -n grub2-mkconfig -o /boot/efi/EFI/fedora/grub.cfg 2>>"$LOG_FILE"
+            sudo grub2-mkconfig -o /boot/grub2/grub.cfg 2>>"$LOG_FILE" || \
+            sudo grub2-mkconfig -o /boot/efi/EFI/fedora/grub.cfg 2>>"$LOG_FILE"
             ;;
         apt)
-            sudo -n update-grub 2>>"$LOG_FILE"
+            sudo update-grub 2>>"$LOG_FILE"
             ;;
     esac
     
@@ -65,6 +65,12 @@ setup_grub() {
 setup_systemd_boot() {
     section "SYSTEMD-BOOT SETUP" "$BLUE"
     log "INFO" "Configuring systemd-boot bootloader"
+    
+    if [ "$DETECTED_DISTRO_ID" = "cachyos" ]; then
+        log "INFO" "CachyOS detected - skipping manual systemd-boot entry creation (handled by distro)"
+        echo -e "${GREEN}CachyOS systemd-boot management detected. Skipping manual entry creation.${NC}"
+        return 0
+    fi
     
     if [ "$DETECTED_PKG_MANAGER" != "pacman" ]; then
         log "WARN" "systemd-boot setup is only supported on Arch Linux"
@@ -89,21 +95,21 @@ setup_systemd_boot() {
     
     if ! bootctl is-installed 2>/dev/null; then
         log "INFO" "Installing systemd-boot to $esp"
-        if ! sudo -n bootctl install --esp-path="$esp" 2>>"$LOG_FILE"; then
+        if ! sudo bootctl install --esp-path="$esp" 2>>"$LOG_FILE"; then
             log "ERROR" "Failed to install systemd-boot"
             echo -e "${RED}Failed to install systemd-boot${NC}"
             return 1
         fi
     else
         log "INFO" "systemd-boot already installed, updating..."
-        sudo -n bootctl update --esp-path="$esp" 2>>"$LOG_FILE" || true
+        sudo bootctl update --esp-path="$esp" 2>>"$LOG_FILE" || true
     fi
     
     local loader_conf="$esp/loader/loader.conf"
     local entries_dir="$esp/loader/entries"
     
-    sudo -n mkdir -p "$esp/loader" 2>>"$LOG_FILE"
-    sudo -n mkdir -p "$entries_dir" 2>>"$LOG_FILE"
+    sudo mkdir -p "$esp/loader" 2>>"$LOG_FILE"
+    sudo mkdir -p "$entries_dir" 2>>"$LOG_FILE"
     
     # Determine entry filename based on distro
     local entry_basename="arch"
@@ -234,7 +240,7 @@ setup_boot() {
 
     if [ "$DETECTED_PKG_MANAGER" = "pacman" ]; then
         log "INFO" "Rebuilding initramfs"
-        if sudo -n mkinitcpio -P 2>>"$LOG_FILE"; then
+        if sudo mkinitcpio -P 2>>"$LOG_FILE"; then
             log "INFO" "Initramfs rebuilt successfully"
         else
             log "ERROR" "Failed to rebuild initramfs"

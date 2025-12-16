@@ -32,7 +32,7 @@ setup_grub() {
         fi
 
         # Try mounting read-only
-        if ! sudo -n mount -o ro "$part" "$MOUNT_POINT" 2>/dev/null; then
+        if ! sudo mount -o ro "$part" "$MOUNT_POINT" 2>/dev/null; then
             log "WARN" "Could not mount $part (might be locked or encrypted)"
             return 1
         fi
@@ -41,17 +41,17 @@ setup_grub() {
         for efi_path in "${EFI_PATHS[@]}"; do
             if [ -f "$MOUNT_POINT/$efi_path" ]; then
                 WIN_EFI_PARTITION="$part"
-                WIN_EFI_UUID=$(sudo -n blkid -s UUID -o value "$part")
+                WIN_EFI_UUID=$(sudo blkid -s UUID -o value "$part")
                 FOUND_EFI_PATH="$efi_path"
                 log "INFO" "Found Windows bootloader at $part (UUID: $WIN_EFI_UUID, Path: $efi_path)"
-                sudo -n umount "$MOUNT_POINT"
+                sudo umount "$MOUNT_POINT"
                 return 0
             fi
         done
 
         # If we get here, no bootloader found
         log "DEBUG" "No Windows EFI bootloader found in $part"
-        sudo -n umount "$MOUNT_POINT"
+        sudo umount "$MOUNT_POINT"
         return 1
     }
 
@@ -62,7 +62,7 @@ setup_grub() {
         if check_efi_partition "$part"; then
             break
         fi
-    done < <(sudo -n lsblk -rno NAME,FSTYPE,PARTTYPE | awk '/vfat|c12a7328-f81f-11d2-ba4b-00a0c93ec93b/ {print "/dev/"$1}')
+    done < <(sudo lsblk -rno NAME,FSTYPE,PARTTYPE | awk '/vfat|c12a7328-f81f-11d2-ba4b-00a0c93ec93b/ {print "/dev/"$1}')
 
     # Clean up mount point
     rmdir "$MOUNT_POINT"
@@ -75,7 +75,7 @@ setup_grub() {
         
         # Show all potential EFI partitions
         echo -e "\n${YELLOW}All potential EFI partitions:${NC}"
-        sudo -n lsblk -o NAME,FSTYPE,PARTTYPE,LABEL,UUID,MOUNTPOINT | grep -E 'vfat|c12a7328-f81f-11d2-ba4b-00a0c93ec93b' || true
+        sudo lsblk -o NAME,FSTYPE,PARTTYPE,LABEL,UUID,MOUNTPOINT | grep -E 'vfat|c12a7328-f81f-11d2-ba4b-00a0c93ec93b' || true
         
         # Show mounted partitions
         echo -e "\n${YELLOW}Currently mounted partitions:${NC}"
@@ -89,9 +89,9 @@ setup_grub() {
     local GRUB_CUSTOM_FILE="/etc/grub.d/40_custom"
     
     # Create backup of existing file
-    sudo -n cp "$GRUB_CUSTOM_FILE" "${GRUB_CUSTOM_FILE}.bak" 2>/dev/null || true
+    sudo cp "$GRUB_CUSTOM_FILE" "${GRUB_CUSTOM_FILE}.bak" 2>/dev/null || true
     
-    cat <<EOF | sudo -n tee "$GRUB_CUSTOM_FILE" >/dev/null
+    cat <<EOF | sudo tee "$GRUB_CUSTOM_FILE" >/dev/null
 #!/bin/sh
 exec tail -n +3 \$0
 
@@ -104,12 +104,12 @@ menuentry "Windows Boot Manager" {
 }
 EOF
 
-    sudo -n chmod +x "$GRUB_CUSTOM_FILE"
+    sudo chmod +x "$GRUB_CUSTOM_FILE"
     log "DEBUG" "Set executable permissions on $GRUB_CUSTOM_FILE"
 
     # Step 3: Update GRUB config (non-interactive)
     log "INFO" "Generating new GRUB configuration"
-    if sudo -n grub-mkconfig -o /boot/grub/grub.cfg; then
+    if sudo grub-mkconfig -o /boot/grub/grub.cfg; then
         log "INFO" "GRUB configuration updated successfully"
         echo -e "${GREEN}Success! Windows added to GRUB.${NC}"
         echo -e "${YELLOW}Reboot to see changes.${NC}"
@@ -120,7 +120,7 @@ EOF
         
         # Restore backup if available
         if [ -f "${GRUB_CUSTOM_FILE}.bak" ]; then
-            sudo -n mv "${GRUB_CUSTOM_FILE}.bak" "$GRUB_CUSTOM_FILE"
+            sudo mv "${GRUB_CUSTOM_FILE}.bak" "$GRUB_CUSTOM_FILE"
             log "INFO" "Restored original GRUB custom file from backup"
         fi
         

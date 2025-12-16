@@ -14,23 +14,23 @@ setup_sddm() {
     for dm in "${display_managers[@]}"; do
         if systemctl is-enabled "$dm" &>/dev/null; then
             log "INFO" "Disabling conflicting display manager: $dm"
-            sudo -n systemctl disable "$dm" 2>>"$LOG_FILE" || true
+            sudo systemctl disable "$dm" 2>>"$LOG_FILE" || true
         fi
     done
     
     case "$DETECTED_PKG_MANAGER" in
         dnf)
-            sudo -n dnf install -y sddm 2>>"$LOG_FILE"
+            sudo dnf install -y sddm 2>>"$LOG_FILE"
             ;;
         pacman)
-            sudo -n pacman -S --noconfirm sddm 2>>"$LOG_FILE"
+            sudo pacman -S --noconfirm sddm 2>>"$LOG_FILE"
             ;;
         apt)
-            sudo -n apt-get install -y sddm 2>>"$LOG_FILE"
+            sudo apt-get install -y sddm 2>>"$LOG_FILE"
             ;;
     esac
     
-    if sudo -n systemctl enable sddm 2>>"$LOG_FILE"; then
+    if sudo systemctl enable sddm 2>>"$LOG_FILE"; then
         log "INFO" "SDDM enabled"
         echo -e "${GREEN}SDDM display manager enabled!${NC}"
         return 0
@@ -47,13 +47,13 @@ setup_kde_plasma() {
     
     case "$DETECTED_PKG_MANAGER" in
         dnf)
-            sudo -n dnf install -y @kde-desktop-environment plasma-workspace-wayland 2>>"$LOG_FILE"
+            sudo dnf install -y @kde-desktop-environment plasma-workspace-wayland 2>>"$LOG_FILE"
             ;;
         pacman)
-            sudo -n pacman -S --noconfirm plasma-desktop plasma-wayland-protocols 2>>"$LOG_FILE"
+            sudo pacman -S --noconfirm plasma-desktop plasma-wayland-protocols 2>>"$LOG_FILE"
             ;;
         apt)
-            sudo -n apt-get install -y kde-plasma-desktop plasma-workspace-wayland 2>>"$LOG_FILE"
+            sudo apt-get install -y kde-plasma-desktop plasma-workspace-wayland 2>>"$LOG_FILE"
             ;;
     esac
     
@@ -76,12 +76,12 @@ setup_hyprland() {
                 print_status info "Enabling Hyprland COPR..."
                 sudo dnf copr enable -y solopasha/hyprland 2>>"$LOG_FILE"
             fi
-            sudo -n dnf install -y hyprland xdg-desktop-portal-hyprland 2>>"$LOG_FILE"
-            sudo -n dnf install -y hypridle hyprlock hyprpaper hyprpicker 2>>"$LOG_FILE" || true
+            sudo dnf install -y hyprland xdg-desktop-portal-hyprland 2>>"$LOG_FILE"
+            sudo dnf install -y hypridle hyprlock hyprpaper hyprpicker 2>>"$LOG_FILE" || true
             ;;
         pacman)
-            sudo -n pacman -S --noconfirm hyprland xdg-desktop-portal-hyprland 2>>"$LOG_FILE"
-            sudo -n pacman -S --noconfirm hypridle hyprlock hyprpaper hyprpicker hyprshot hyprutils 2>>"$LOG_FILE" || true
+            sudo pacman -S --noconfirm hyprland xdg-desktop-portal-hyprland 2>>"$LOG_FILE"
+            sudo pacman -S --noconfirm hypridle hyprlock hyprpaper hyprpicker hyprshot hyprutils 2>>"$LOG_FILE" || true
             ;;
         apt)
             echo -e "${YELLOW}Hyprland on Ubuntu requires manual build or PPA${NC}"
@@ -101,13 +101,13 @@ setup_keyring() {
     
     case "$DETECTED_PKG_MANAGER" in
         dnf)
-            sudo -n dnf install -y gnome-keyring seahorse libsecret 2>>"$LOG_FILE"
+            sudo dnf install -y gnome-keyring seahorse libsecret 2>>"$LOG_FILE"
             ;;
         pacman)
-            sudo -n pacman -S --noconfirm gnome-keyring seahorse libsecret 2>>"$LOG_FILE"
+            sudo pacman -S --noconfirm gnome-keyring seahorse libsecret 2>>"$LOG_FILE"
             ;;
         apt)
-            sudo -n apt-get install -y gnome-keyring seahorse libsecret-1-0 2>>"$LOG_FILE"
+            sudo apt-get install -y gnome-keyring seahorse libsecret-1-0 2>>"$LOG_FILE"
             ;;
     esac
     

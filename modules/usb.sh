@@ -16,7 +16,7 @@ disable_usb_autosuspend() {
     local udev_content='# Disable USB autosuspend
 ACTION=="add", SUBSYSTEM=="usb", TEST=="power/control", ATTR{power/control}="on"'
     
-    if echo "$udev_content" | sudo -n tee "$udev_rules_file" > /dev/null; then
+    if echo "$udev_content" | sudo tee "$udev_rules_file" > /dev/null; then
         log "INFO" "Created udev rule to disable USB autosuspend"
         print_status success "USB autosuspend disabled via udev"
     else
@@ -29,13 +29,13 @@ ACTION=="add", SUBSYSTEM=="usb", TEST=="power/control", ATTR{power/control}="on"
     local sysctl_content='# Disable USB autosuspend
 kernel.usb.autosuspend = -1'
     
-    if echo "$sysctl_content" | sudo -n tee "$sysctl_conf" > /dev/null; then
+    if echo "$sysctl_content" | sudo tee "$sysctl_conf" > /dev/null; then
         log "INFO" "Created sysctl configuration for USB"
-        sudo -n sysctl -p "$sysctl_conf" 2>> "$LOG_FILE" || true
+        sudo sysctl -p "$sysctl_conf" 2>> "$LOG_FILE" || true
     fi
     
     # Reload udev rules
-    if sudo -n udevadm control --reload-rules && sudo -n udevadm trigger; then
+    if sudo udevadm control --reload-rules && sudo udevadm trigger; then
         log "INFO" "Reloaded udev rules"
         print_status success "USB configuration applied"
         return 0

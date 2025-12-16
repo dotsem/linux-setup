@@ -14,16 +14,16 @@ apply_sysctl_tweaks() {
     local ram_gb=$(free -g | awk '/Mem:/ {print $2}')
     
     if [ "$ram_gb" -ge 16 ]; then
-        echo "vm.swappiness=10" | sudo -n tee /etc/sysctl.d/99-swappiness.conf > /dev/null
-        sudo -n sysctl -p /etc/sysctl.d/99-swappiness.conf 2>>"$LOG_FILE"
+        echo "vm.swappiness=10" | sudo tee /etc/sysctl.d/99-swappiness.conf > /dev/null
+        sudo sysctl -p /etc/sysctl.d/99-swappiness.conf 2>>"$LOG_FILE"
         log "INFO" "Optimized swappiness for ${ram_gb}GB RAM system"
         print_status success "Memory swappiness optimized"
     fi
     
     if lspci | grep -qi nvidia && [ "$ram_gb" -ge 8 ]; then
-        echo "vm.dirty_background_ratio=5" | sudo -n tee /etc/sysctl.d/99-performance.conf > /dev/null
-        echo "vm.dirty_ratio=10" | sudo -n tee -a /etc/sysctl.d/99-performance.conf > /dev/null
-        sudo -n sysctl -p /etc/sysctl.d/99-performance.conf 2>>"$LOG_FILE"
+        echo "vm.dirty_background_ratio=5" | sudo tee /etc/sysctl.d/99-performance.conf > /dev/null
+        echo "vm.dirty_ratio=10" | sudo tee -a /etc/sysctl.d/99-performance.conf > /dev/null
+        sudo sysctl -p /etc/sysctl.d/99-performance.conf 2>>"$LOG_FILE"
         log "INFO" "Applied gaming performance tweaks"
         print_status success "Gaming performance tweaks applied"
     fi

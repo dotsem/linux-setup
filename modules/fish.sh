@@ -13,13 +13,13 @@ setup_fish() {
         log "INFO" "Installing fish..."
         case "$DETECTED_PKG_MANAGER" in
             pacman)
-                sudo -n pacman -S --noconfirm fish 2>>"$LOG_FILE"
+                sudo pacman -S --noconfirm fish 2>>"$LOG_FILE"
                 ;;
             dnf)
-                sudo -n dnf install -y fish 2>>"$LOG_FILE"
+                sudo dnf install -y fish 2>>"$LOG_FILE"
                 ;;
             apt)
-                sudo -n apt-get install -y fish 2>>"$LOG_FILE"
+                sudo apt-get install -y fish 2>>"$LOG_FILE"
                 ;;
         esac
     else
@@ -49,7 +49,7 @@ setup_fish() {
     
     log "INFO" "Setting Fish as default shell"
     # Use usermod instead of chsh - works better on locked root systems
-    if sudo -n usermod --shell "$fish_path" "$USER" 2>>"$LOG_FILE"; then
+    if sudo usermod --shell "$fish_path" "$USER" 2>>"$LOG_FILE"; then
         log "INFO" "Successfully set Fish as default shell"
         echo -e "${GREEN}Fish set as default shell!${NC}"
         echo -e "${YELLOW}Note: Log out required for changes to take effect${NC}"
