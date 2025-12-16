@@ -127,7 +127,11 @@ development_setup() {
     echo -e "  ${GREEN}3)${NC} Node.js + PNPM only"
     echo -e "  ${GREEN}4)${NC} Rust only"
     echo -e "  ${GREEN}5)${NC} Go only"
-    echo -e "  ${GREEN}6)${NC} Back to main menu\n"
+    echo -e "  ${GREEN}6)${NC} Java only"
+    echo -e "  ${GREEN}7)${NC} PHP only"
+    echo -e "  ${GREEN}8)${NC} Docker only"
+    echo -e "  ${GREEN}9)${NC} .NET only"
+    echo -e "  ${GREEN}0)${NC} Back to main menu\n"
     
     echo -ne "${YELLOW}Enter your choice:${NC} "
     read -r dev_choice
