@@ -135,7 +135,7 @@ clone_dotfiles() {
     local config_fish="$HOME/.config/fish"
     if [ -d "$config_fish" ]; then
         log "INFO" "Backing up existing fish config folder to allow stow..."
-        mv "$config_fish" "pre-stow-${config_fish}"
+        mv "$config_fish" "${config_fish}-pre-stow"
     fi
     
     local stowed=0
