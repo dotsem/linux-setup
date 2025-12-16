@@ -210,6 +210,101 @@ EOF
     echo -e "${GREEN}Windows boot entry added!${NC}"
 }
 
+setup_refind() {
+    section "rEFInd BOOTLOADER SETUP" "$BLUE"
+    log "INFO" "Configuring rEFInd bootloader"
+
+    if [ ! -d "/sys/firmware/efi" ]; then
+        log "ERROR" "EFI not detected - rEFInd requires UEFI"
+        echo -e "${RED}ERROR: rEFInd requires UEFI boot mode${NC}"
+        echo -e "${YELLOW}Falling back to GRUB...${NC}"
+        setup_grub
+        return $?
+    fi
+
+    local esp="/boot"
+    if mountpoint -q /boot/efi 2>/dev/null; then
+        esp="/boot/efi"
+    fi
+
+    if ! command -v refind-install >/dev/null 2>&1; then
+        log "INFO" "rEFInd not found; attempting to install via package manager"
+        case "$DETECTED_PKG_MANAGER" in
+            pacman)
+                sudo pacman -S --noconfirm refind 2>>"$LOG_FILE" || true
+                ;;
+            dnf)
+                sudo dnf install -y refind 2>>"$LOG_FILE" || true
+                ;;
+            apt)
+                sudo apt-get update -y 2>>"$LOG_FILE" || true
+                sudo apt-get install -y refind 2>>"$LOG_FILE" || true
+                ;;
+            *)
+                log "WARN" "Unknown package manager; please install rEFInd manually"
+                echo -e "${YELLOW}Please install rEFInd manually and re-run this script${NC}"
+                return 1
+                ;;
+        esac
+    fi
+
+    local refind_dir="$esp/EFI/refind"
+    sudo mkdir -p "$refind_dir" 2>>"$LOG_FILE"
+
+    # Attempt to run the installer (may be a no-op if already installed)
+    sudo refind-install 2>>"$LOG_FILE" || true
+
+    if [ ! -d "$refind_dir" ]; then
+        log "ERROR" "rEFInd installation did not create $refind_dir"
+        echo -e "${RED}Failed to install rEFInd into $esp${NC}"
+        return 1
+    fi
+
+    local refind_conf="$refind_dir/refind.conf"
+
+    # Determine root identifier for manual linux stanza
+    local root_partuuid
+    local root_param
+    root_partuuid=$(findmnt -no PARTUUID /)
+    if [ -n "$root_partuuid" ]; then
+        root_param="root=PARTUUID=$root_partuuid"
+    else
+        root_partuuid=$(findmnt -no UUID /)
+        if [ -n "$root_partuuid" ]; then
+            root_param="root=UUID=$root_partuuid"
+        fi
+    fi
+
+    local kernel_params="rw quiet"
+    if lspci | grep -qi nvidia; then
+        kernel_params="$kernel_params nvidia-drm.modeset=1"
+    fi
+
+    # Create a minimal refind.conf if one doesn't exist to provide a reliable linux entry
+    if [ ! -f "$refind_conf" ]; then
+        log "INFO" "Creating basic rEFInd config at $refind_conf"
+        sudo tee "$refind_conf" > /dev/null << EOF
+timeout 20
+scanfor internal,external,optical,hdbios,manual
+default_selection 1
+showtools reboot,shutdown
+
+menuentry "Linux (manual entry)" {
+    loader /vmlinuz-${KERNEL_TYPE}
+    initrd /initramfs-${KERNEL_TYPE}.img
+    options $root_param $kernel_params
+    icon /EFI/refind/icons/os_linux.png
+}
+EOF
+    else
+        log "INFO" "rEFInd config already exists, not overwriting"
+    fi
+
+    log "INFO" "rEFInd configured successfully"
+    echo -e "${GREEN}rEFInd bootloader configured!${NC}"
+    return 0
+}
+
 setup_boot() {
     section "BOOT CUSTOMIZATION" "$WHITE"
     local errors=0
@@ -232,6 +327,9 @@ setup_boot() {
     case "$BOOTLOADER" in
         systemd-boot)
             setup_systemd_boot || ((errors++))
+            ;;
+        refind)
+            setup_refind || ((errors++))
             ;;
         grub|*)
             setup_grub || ((errors++))

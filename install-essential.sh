@@ -227,13 +227,8 @@ configure_system() {
     execute_step "Desktop environment" setup_desktop_environment || true
     execute_step "NVIDIA setup" setup_nvidia || true
     execute_step "Virtualization setup" setup_virtualization || true
-    
-    if [ "$DETECTED_PKG_MANAGER" = "pacman" ]; then
-        if [ "$BOOTLOADER" = "grub" ]; then
-            execute_step "GRUB configuration" setup_grub || true
-        fi
-        execute_step "Boot configuration" setup_boot || true
-    fi
+
+    execute_step "Boot configuration" setup_boot || true
 }
 
 setup_development_if_needed() {
