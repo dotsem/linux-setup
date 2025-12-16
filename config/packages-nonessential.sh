@@ -113,9 +113,8 @@ NONESSENTIAL_AUR_PACKAGES=(
     spotify-launcher
     
     # Utilities
-    neofetch
-    quickshell-git
     xwaylandvideobridge
+    fastfetch
     yay-bin
     
     # System monitors
