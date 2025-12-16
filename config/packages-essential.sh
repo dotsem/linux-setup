@@ -57,6 +57,7 @@ ESSENTIAL_PACMAN_PACKAGES=(
     htop
     stow
     rsync
+    ninja
     
     # Brightness and power
     brightnessctl

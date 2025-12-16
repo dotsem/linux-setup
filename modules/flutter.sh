@@ -65,10 +65,10 @@ setup_android_sdk() {
     
     print_status info "Installing Android SDK components..."
     sdkmanager "platform-tools" 2>>"$LOG_FILE"
-    sdkmanager "platforms;android-34" 2>>"$LOG_FILE"
-    sdkmanager "build-tools;34.0.0" 2>>"$LOG_FILE"
+    sdkmanager "platforms;android-36" 2>>"$LOG_FILE"
+    sdkmanager "build-tools;28.0.3" 2>>"$LOG_FILE"
     sdkmanager "emulator" 2>>"$LOG_FILE"
-    sdkmanager "system-images;android-34;google_apis;x86_64" 2>>"$LOG_FILE"
+    sdkmanager "system-images;android-36;google_apis;x86_64" 2>>"$LOG_FILE"
     
     log "INFO" "Android SDK installed successfully"
     echo -e "${GREEN}Android SDK ready!${NC}"
@@ -90,7 +90,7 @@ setup_android_avd() {
     print_status info "Creating AVD 'flutter_emulator'..."
     echo "no" | avdmanager create avd \
         -n "flutter_emulator" \
-        -k "system-images;android-34;google_apis;x86_64" \
+        -k "system-images;android-36;google_apis;x86_64" \
         -d "pixel_6" \
         --force 2>>"$LOG_FILE"
     
