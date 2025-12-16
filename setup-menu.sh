@@ -72,12 +72,12 @@ resume_nonessential() {
 system_test() {
     echo -e "\n${BLUE}Running system tests...${NC}\n"
     
-    if [ ! -f "$SCRIPT_DIR/sysunit" ]; then
-        echo -e "${RED}Error: sysunit not found!${NC}"
+    if [ ! -f "$SCRIPT_DIR/sysunit.sh" ]; then
+        echo -e "${RED}Error: sysunit.sh not found!${NC}"
         return 1
     fi
     
-    bash "$SCRIPT_DIR/sysunit"
+    bash "$SCRIPT_DIR/sysunit.sh"
 }
 
 check_status() {
