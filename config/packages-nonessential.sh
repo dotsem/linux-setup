@@ -113,9 +113,9 @@ NONESSENTIAL_AUR_PACKAGES=(
     spotify-launcher
     
     # Utilities
-    xwaylandvideobridge
+    # xwaylandvideobridge
     fastfetch
-    yay-bin
+    # yay-bin
     
     # System monitors
     btop

@@ -77,7 +77,14 @@ setup_node() {
     fi
     
     if ! command -v pnpm &>/dev/null; then
-        npm install -g pnpm 2>>"$LOG_FILE"
+        case "$DETECTED_PKG_MANAGER" in
+            pacman)
+                sudo pacman -S --noconfirm pnpm 2>>"$LOG_FILE"
+                ;;
+            *)
+                npm install -g pnpm 2>>"$LOG_FILE"
+                ;;
+        esac
     fi
     
     pnpm setup 2>>"$LOG_FILE"

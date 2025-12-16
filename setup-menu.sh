@@ -86,12 +86,21 @@ check_status() {
     echo -e "${CYAN}Detected distro:${NC} $DETECTED_DISTRO_NAME"
     echo -e "${CYAN}Package manager:${NC} $DETECTED_PKG_MANAGER\n"
     
-    if [ -f "$HOME/arch_setup.log" ]; then
-        echo -e "${GREEN}✓${NC} Installation log exists"
-        local log_size=$(du -h "$HOME/arch_setup.log" | cut -f1)
-        echo -e "  Log size: $log_size"
+    local main_log="$HOME/linux_setup.log"
+    local apres_log="$HOME/.cache/apres-setup.log"
+    
+    if [ -f "$main_log" ]; then
+        echo -e "${GREEN}✓${NC} Main installation log found"
+        echo -e "  Path: $main_log"
+        echo -e "  Size: $(du -h "$main_log" | cut -f1)"
     else
-        echo -e "${YELLOW}⚠${NC} No installation log found"
+        echo -e "${YELLOW}⚠${NC} Main installation log not found (linux_setup.log)"
+    fi
+    
+    if [ -f "$apres_log" ]; then
+        echo -e "${GREEN}✓${NC} Apres-setup log found"
+        echo -e "  Path: $apres_log"
+        echo -e "  Size: $(du -h "$apres_log" | cut -f1)"
     fi
     
     echo ""

@@ -28,6 +28,7 @@ source "$SCRIPT_DIR/modules/development.sh"
 source "$SCRIPT_DIR/modules/nvidia.sh"
 source "$SCRIPT_DIR/modules/desktop.sh"
 source "$SCRIPT_DIR/modules/gaming.sh"
+source "$SCRIPT_DIR/modules/virtualization.sh"
 
 declare -g ERRORS=0
 declare -ga FAILED_STEPS=()
@@ -225,6 +226,7 @@ configure_system() {
     
     execute_step "Desktop environment" setup_desktop_environment || true
     execute_step "NVIDIA setup" setup_nvidia || true
+    execute_step "Virtualization setup" setup_virtualization || true
     
     if [ "$DETECTED_PKG_MANAGER" = "pacman" ]; then
         if [ "$BOOTLOADER" = "grub" ]; then

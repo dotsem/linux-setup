@@ -30,7 +30,7 @@ setup_vulkan() {
             sudo dnf install -y mesa-vulkan-drivers vulkan-loader vulkan-tools 2>>"$LOG_FILE"
             ;;
         pacman)
-            sudo pacman -S --noconfirm vulkan-icd-loader vulkan-tools lib32-vulkan-icd-loader 2>>"$LOG_FILE"
+            sudo pacman -S --noconfirm vulkan-icd-loader vulkan-tools lib32-vulkan-icd-loader lib32-mesa lib32-gcc-libs 2>>"$LOG_FILE"
             if lspci | grep -qi nvidia; then
                 sudo pacman -S --noconfirm nvidia-utils lib32-nvidia-utils 2>>"$LOG_FILE"
             fi
