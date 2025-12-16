@@ -131,6 +131,13 @@ clone_dotfiles() {
     
     cd "$DOTFILES_DIR"
     
+    # Pre-stow cleanup (backup existing configs that conflict)
+    local config_fish="$HOME/.config/fish/config.fish"
+    if [ -f "$config_fish" ] && [ ! -L "$config_fish" ]; then
+        log "INFO" "Backing up existing fish config to allow stow..."
+        mv "$config_fish" "${config_fish}.pre-stow"
+    fi
+    
     local stowed=0
     local failed=0
     
