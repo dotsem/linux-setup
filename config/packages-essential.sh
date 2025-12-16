@@ -84,6 +84,7 @@ ESSENTIAL_PACMAN_PACKAGES=(
     hyprshot
     hyprutils
     hyprpolkitagent
+    waybar
     
     # Application launcher
     wofi
