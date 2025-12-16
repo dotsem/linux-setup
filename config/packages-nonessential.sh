@@ -97,7 +97,6 @@ NONESSENTIAL_AUR_PACKAGES=(
     android-sdk
     android-sdk-cmdline-tools-latest
     angular-cli
-    flutter
     xampp
     
     # Communication
