@@ -42,7 +42,12 @@ ESSENTIAL_PACMAN_PACKAGES=(
     # File management
     lf
     udiskie
-    
+    thunar
+    tumbler
+    ffmpegthumbnailer
+    libgsf
+    poppler-glib
+
     # Essential utilities
     nano
     neovim
