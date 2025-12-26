@@ -64,7 +64,8 @@ ESSENTIAL_PACMAN_PACKAGES=(
     stow
     rsync
     ninja
-    
+    acpi
+
     # Brightness and power
     brightnessctl
     tlp
