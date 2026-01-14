@@ -123,7 +123,6 @@ NONESSENTIAL_AUR_PACKAGES=(
   # Additional tools
   postman-bin
   insomnia-bin
-  direnv
 )
 
 NONESSENTIAL_FLATPAK_PACKAGES=(
