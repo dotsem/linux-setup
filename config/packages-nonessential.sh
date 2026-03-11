@@ -124,6 +124,7 @@ NONESSENTIAL_AUR_PACKAGES=(
   postman-bin
   insomnia-bin
   thunar-archive-plugin
+  Xarchiver
 )
 
 NONESSENTIAL_FLATPAK_PACKAGES=(
