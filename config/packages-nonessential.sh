@@ -123,6 +123,7 @@ NONESSENTIAL_AUR_PACKAGES=(
   # Additional tools
   postman-bin
   insomnia-bin
+  thunar-archive-plugin
 )
 
 NONESSENTIAL_FLATPAK_PACKAGES=(
